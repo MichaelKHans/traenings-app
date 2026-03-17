@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - V3.2 Stable</title>
+    <title>Fitness Master 3000 - V3.3 Master Key</title>
     
     <style>
         :root {
@@ -71,7 +71,7 @@
         .btn-diag { background: #222; color: var(--muted-text); border: 1px solid #444; font-size: 0.6em; margin-top: 5px; }
         
         #version-info { text-align: center; font-size: 0.7em; color: #555; margin-top: 10px; cursor: pointer; }
-        #toast { visibility: hidden; position: fixed; left: 50%; bottom: 220px; transform: translateX(-50%); background: var(--neon-cyan); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; }
+        #toast { visibility: hidden; position: fixed; left: 50%; bottom: 200px; transform: translateX(-50%); background: var(--neon-cyan); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; }
         #toast.show { visibility: visible; }
     </style>
 </head>
@@ -100,8 +100,8 @@
     <div id="workout-container"></div>
 
     <div class="ai-log-section">
-        <div style="color:var(--neon-cyan); font-size:0.8em; text-transform:uppercase; margin-bottom:8px;">🤖 SPØRG GEMINI (V3.2 STABLE)</div>
-        <textarea id="ai_log_input" placeholder="Fx: 'Hvordan føles vægten i dag?'"></textarea>
+        <div style="color:var(--neon-cyan); font-size:0.8em; text-transform:uppercase; margin-bottom:8px;">🤖 SPØRG GEMINI (V3.3 MASTER)</div>
+        <textarea id="ai_log_input" placeholder="Fx: 'Vægten føltes let i dag?'"></textarea>
         <div id="ai-response-box"></div>
         <button class="action-btn btn-diag" style="width:100%;" onclick="toggleLog()">[ Vis System Log ]</button>
         <div id="diagnostic-log">Log er tom...</div>
@@ -112,7 +112,7 @@
             <button class="action-btn btn-save" onclick="saveData()">[Gem]</button>
             <button class="action-btn btn-ai" onclick="askGemini()">[Spørg Gemini]</button>
         </div>
-        <div id="version-info" onclick="toggleSettings()">V3.2 | Indstillinger ⚙️</div>
+        <div id="version-info" onclick="toggleSettings()">V3.3 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:15px; border-top: 1px dashed #444; margin-top: 10px;">
             <input type="text" id="api_key_input" placeholder="Indsæt AI nøgle her...">
@@ -155,38 +155,48 @@
         const userMsg = document.getElementById('ai_log_input').value || "Hej";
         const responseBox = document.getElementById('ai-response-box');
         responseBox.style.display = 'block';
-        responseBox.innerText = "Tænker... 🤖";
+        responseBox.innerText = "Scanner efter aktiv model... 🤖";
         
-        logToSystem("Starter anmodning (V3.2 STABLE)...");
+        logToSystem("V3.3 Scanner starter...");
 
-        // FIX: Bruger nu den stabile 'v1' i stedet for 'v1beta'
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
+        // Liste over modeller vi scanner igennem
+        const models = [
+            "gemini-1.5-flash-latest",
+            "gemini-1.5-flash",
+            "gemini-pro",
+            "gemini-1.0-pro"
+        ];
         
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: "Du er en personlig træner. Svar kort på dansk: " + userMsg }] }]
-                })
-            });
+        for (let modelName of models) {
+            logToSystem(`Prøver model: ${modelName}...`);
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${key}`;
             
-            const result = await response.json();
-            logToSystem("Status: " + response.status);
-            logToSystem("Svar: " + JSON.stringify(result).substring(0, 100) + "...");
-
-            if (result.error) {
-                responseBox.innerText = "FEJL: " + result.error.message;
-                responseBox.style.color = "var(--neon-red)";
-                logToSystem("ERROR DETAIL: " + JSON.stringify(result.error));
-            } else {
-                responseBox.innerText = result.candidates[0].content.parts[0].text;
-                responseBox.style.color = "var(--neon-green)";
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: "Du er træner for Michael (bygningskonstruktør). Svar meget kort på dansk: " + userMsg }] }]
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && !result.error) {
+                    logToSystem(`SUCCES med ${modelName}!`);
+                    responseBox.innerText = result.candidates[0].content.parts[0].text;
+                    responseBox.style.color = "var(--neon-green)";
+                    return; // Vi er færdige
+                } else {
+                    logToSystem(`FEJL på ${modelName}: ${result.error ? result.error.message : 'Ukendt'}`);
+                }
+            } catch (e) {
+                logToSystem(`CRASH på ${modelName}: ${e.message}`);
             }
-        } catch (e) {
-            logToSystem("NETVÆRKSFEJL: " + e.message);
-            responseBox.innerText = "KUNNE IKKE FORBINDE.";
         }
+
+        responseBox.innerText = "FEJL: Ingen modeller svarede. Tjek loggen for detaljer.";
+        responseBox.style.color = "var(--neon-red)";
     }
 
     function toggleDay(id) {
@@ -259,6 +269,7 @@
     function updateProgress() { let done = 0; exercises.forEach(ex => { if(document.getElementById(`${ex.id}_check`).checked) done++; }); document.getElementById('progress-bar').style.width = (done / exercises.length * 100) + "%"; }
     function saveData() { let activeDays = []; document.querySelectorAll('.day-box.active').forEach(db => activeDays.push(db.id)); localStorage.setItem('calendar_V3', JSON.stringify(activeDays)); let data = { date: new Date().toLocaleDateString('da-DK'), exercises: {} }; exercises.forEach(ex => { data.exercises[ex.id] = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value }; }); localStorage.setItem('workoutData_V3', JSON.stringify(data)); showToast("DATA GEMT"); }
     function loadData() { const saved = localStorage.getItem('workoutData_V3'); if (!saved) return; const data = JSON.parse(saved); exercises.forEach(ex => { const ed = data.exercises[ex.id]; if(ed) { document.getElementById(`${ex.id}_check`).checked = ed.checked; if(ed.status) setStatus(ex.id, ed.status); } }); updateProgress(); }
+    function exportData() { saveData(); showToast("KOPIERET"); }
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 2000); }
 
     window.onload = renderApp;
