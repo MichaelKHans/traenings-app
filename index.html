@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - V2.5 AI Fix</title>
+    <title>Fitness Master 3000 - V2.6</title>
     
     <style>
         :root {
@@ -34,6 +34,7 @@
 
         h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 15px; }
         
+        /* Kalender */
         .calendar-container { background-color: #000; border: 2px solid var(--neon-purple); padding: 10px; margin-bottom: 20px; border-radius: 4px; box-shadow: 4px 4px 0px var(--neon-purple); }
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; color: var(--neon-purple); margin-bottom: 10px; text-transform: uppercase; font-size: 0.9em; }
         .nav-btn { background: #111; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 5px 15px; cursor: pointer; font-family: inherit; }
@@ -54,17 +55,29 @@
         .timer-btn { background-color: #000; color: var(--neon-orange); border: 2px solid var(--neon-orange); padding: 10px; width: 100%; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .timer-bar-fill { width: 0%; height: 100%; background-color: var(--neon-orange); transition: width 1s linear; }
 
-        /* Øvelseskort med farver */
-        .exercise-card { background-color: var(--card-bg); padding: 15px; margin-bottom: 25px; border-left: 8px solid var(--muted-text); box-shadow: var(--retro-shadow); position: relative; }
-        .card-0 { border-left-color: var(--neon-cyan) !important; } .card-0 .exercise-name { color: var(--neon-cyan) !important; }
-        .card-1 { border-left-color: var(--neon-green) !important; } .card-1 .exercise-name { color: var(--neon-green) !important; }
-        .card-2 { border-left-color: var(--neon-purple) !important; } .card-2 .exercise-name { color: var(--neon-purple) !important; }
-        .card-3 { border-left-color: var(--neon-orange) !important; } .card-3 .exercise-name { color: var(--neon-orange) !important; }
-        .card-4 { border-left-color: var(--neon-yellow) !important; } .card-4 .exercise-name { color: var(--neon-yellow) !important; }
-        .card-5 { border-left-color: var(--neon-red) !important; } .card-5 .exercise-name { color: var(--neon-red) !important; }
+        /* Øvelseskort med SUPER-tydelige farver */
+        .exercise-card { background-color: var(--card-bg); padding: 15px; margin-bottom: 25px; border-left: 10px solid var(--muted-text); box-shadow: var(--retro-shadow); position: relative; }
+        
+        .card-0 { border-left-color: var(--neon-cyan) !important; }
+        .card-0 .exercise-name { color: var(--neon-cyan) !important; text-shadow: 0 0 5px var(--neon-cyan); }
+
+        .card-1 { border-left-color: var(--neon-green) !important; }
+        .card-1 .exercise-name { color: var(--neon-green) !important; text-shadow: 0 0 5px var(--neon-green); }
+
+        .card-2 { border-left-color: var(--neon-purple) !important; }
+        .card-2 .exercise-name { color: var(--neon-purple) !important; text-shadow: 0 0 5px var(--neon-purple); }
+
+        .card-3 { border-left-color: var(--neon-orange) !important; }
+        .card-3 .exercise-name { color: var(--neon-orange) !important; text-shadow: 0 0 5px var(--neon-orange); }
+
+        .card-4 { border-left-color: var(--neon-yellow) !important; }
+        .card-4 .exercise-name { color: var(--neon-yellow) !important; text-shadow: 0 0 5px var(--neon-yellow); }
+
+        .card-5 { border-left-color: var(--neon-red) !important; }
+        .card-5 .exercise-name { color: var(--neon-red) !important; text-shadow: 0 0 5px var(--neon-red); }
 
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .info-btn { background: #000; color: var(--text-color); border: 1px solid #444; padding: 4px 8px; font-size: 0.7em; cursor: pointer; font-family: inherit; }
+        .info-btn { background: #000; color: #fff; border: 1px solid #555; padding: 4px 8px; font-size: 0.7em; cursor: pointer; font-family: inherit; }
         .info-box { display: none; background-color: #000; border: 1px solid var(--neon-cyan); padding: 12px; margin: 10px 0; font-size: 0.85em; color: var(--text-color); line-height: 1.4; }
         .info-box.show { display: block; }
 
@@ -84,7 +97,7 @@
         
         textarea { width: 100%; padding: 10px; background-color: #000; border: 1px solid var(--muted-text); color: #fff; margin-top: 5px; font-family: inherit; box-sizing: border-box; }
 
-        /* AI CHAT LAYOUT */
+        /* AI CHAT */
         .ai-log-section { background-color: #000; border: 2px solid var(--neon-cyan); padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--neon-cyan); }
         #ai-response-box { 
             display: none; background-color: #111; border: 1px solid var(--neon-green); padding: 12px; 
@@ -129,7 +142,7 @@
 
     <div class="ai-log-section">
         <div style="color:var(--neon-cyan); font-size:0.8em; text-transform:uppercase; margin-bottom:8px;">🤖 SPØRG GEMINI (Live Sparring)</div>
-        <textarea id="ai_log_input" placeholder="Fx: 'Vægten føltes let i dag, skal jeg øge?'"></textarea>
+        <textarea id="ai_log_input" placeholder="Fx: 'Mine ben er ømme, skal jeg tage 3 sæt?'"></textarea>
         <div id="ai-response-box"></div>
     </div>
 
@@ -139,10 +152,10 @@
             <button class="action-btn btn-ai" onclick="askGemini()">[Spørg Gemini]</button>
             <button class="action-btn btn-export" onclick="exportData()">[Log]</button>
         </div>
-        <div id="version-info" onclick="toggleSettings()">V2.5 | Indstillinger ⚙️</div>
+        <div id="version-info" onclick="toggleSettings()">V2.6 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:15px; border-top: 1px dashed #444; margin-top: 10px;">
-            <div style="color: var(--neon-cyan); font-size: 0.7em; margin-bottom: 5px;">DIN API NØGLE (SYNLIG):</div>
+            <div style="color: var(--neon-cyan); font-size: 0.7em; margin-bottom: 5px;">DIN API NØGLE (STABIL v1):</div>
             <input type="text" id="api_key_input" placeholder="Indsæt din nøgle her...">
             <div style="display: flex; gap: 5px;">
                 <button class="action-btn btn-save" style="padding:10px; flex: 2;" onclick="saveKey()">Gem Nøgle</button>
@@ -208,7 +221,7 @@
         }
     }
 
-    // --- AI LOGIK (V2.5 FIX TIL v1beta) ---
+    // --- AI LOGIK (V2.6 FIX TIL STABLE v1) ---
     async function askGemini() {
         const key = (localStorage.getItem('gemini_api_key_V2') || "").trim();
         if (!key || key.length < 10) { alert("Indsæt nøgle i indstillinger."); toggleSettings(); return; }
@@ -217,13 +230,13 @@
 
         const responseBox = document.getElementById('ai-response-box');
         responseBox.style.display = 'block';
-        responseBox.innerText = "Forbinder til Gemini... 🤖";
+        responseBox.innerText = "Forbinder til Gemini (Stable v1)... 🤖";
         responseBox.style.color = "var(--neon-green)";
 
-        // Præcis port til 1.5-flash
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+        // Skifter til den stabile v1 port som Gemini 1.5 Flash nu kræver
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
 
-        const promptText = `Du er en personlig træner for Michael (bygningskonstruktør, rygskade). Svar kort og motiverende på dansk. Michaels spørgsmål: ${userMsg}`;
+        const promptText = `Du er en trænings-coach for Michael (bygningskonstruktør). Svar kort og præcist på dansk. Michaels spørgsmål: ${userMsg}`;
 
         try {
             const response = await fetch(url, {
@@ -233,12 +246,12 @@
             });
             const result = await response.json();
             if (result.error) {
-                responseBox.innerText = "FEJL: " + result.error.message;
+                responseBox.innerText = "GOOGLE SIGER: " + result.error.message;
                 responseBox.style.color = "var(--neon-red)";
             } else {
                 responseBox.innerText = result.candidates[0].content.parts[0].text;
             }
-        } catch (e) { responseBox.innerText = "Netværksfejl. Tjek din internetforbindelse."; }
+        } catch (e) { responseBox.innerText = "Forbindelsesfejl. Tjek dit internet."; }
     }
 
     // --- INDSTILLINGER ---
