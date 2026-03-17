@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - V2.7 AI Auto-Fix</title>
+    <title>Fitness Master 3000 - V2.9</title>
     
     <style>
         :root {
@@ -34,6 +34,7 @@
 
         h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 15px; }
         
+        /* Kalender */
         .calendar-container { background-color: #000; border: 2px solid var(--neon-purple); padding: 10px; margin-bottom: 20px; border-radius: 4px; box-shadow: 4px 4px 0px var(--neon-purple); }
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; color: var(--neon-purple); margin-bottom: 10px; text-transform: uppercase; font-size: 0.9em; }
         .nav-btn { background: #111; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 5px 15px; cursor: pointer; font-family: inherit; }
@@ -54,8 +55,8 @@
         .timer-btn { background-color: #000; color: var(--neon-orange); border: 2px solid var(--neon-orange); padding: 10px; width: 100%; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .timer-bar-fill { width: 0%; height: 100%; background-color: var(--neon-orange); transition: width 1s linear; }
 
+        /* Øvelseskort med farver (som i V2.6) */
         .exercise-card { background-color: var(--card-bg); padding: 15px; margin-bottom: 25px; border-left: 10px solid var(--muted-text); box-shadow: var(--retro-shadow); position: relative; }
-        
         .card-0 { border-left-color: var(--neon-cyan) !important; } .card-0 .exercise-name { color: var(--neon-cyan) !important; text-shadow: 0 0 5px var(--neon-cyan); }
         .card-1 { border-left-color: var(--neon-green) !important; } .card-1 .exercise-name { color: var(--neon-green) !important; text-shadow: 0 0 5px var(--neon-green); }
         .card-2 { border-left-color: var(--neon-purple) !important; } .card-2 .exercise-name { color: var(--neon-purple) !important; text-shadow: 0 0 5px var(--neon-purple); }
@@ -78,6 +79,7 @@
         #api_key_input { width: 100%; box-sizing: border-box; text-align: left; font-size: 11px; margin-bottom: 10px; border-color: var(--neon-cyan); color: var(--neon-cyan); }
         textarea { width: 100%; padding: 10px; background-color: #000; border: 1px solid var(--muted-text); color: #fff; margin-top: 5px; font-family: inherit; box-sizing: border-box; }
 
+        /* AI CHAT */
         .ai-log-section { background-color: #000; border: 2px solid var(--neon-cyan); padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--neon-cyan); }
         #ai-response-box { display: none; background-color: #111; border: 1px solid var(--neon-green); padding: 12px; margin-top: 15px; color: var(--neon-green); font-size: 0.85em; line-height: 1.5; }
 
@@ -118,7 +120,7 @@
 
     <div class="ai-log-section">
         <div style="color:var(--neon-cyan); font-size:0.8em; text-transform:uppercase; margin-bottom:8px;">🤖 SPØRG GEMINI (Live Sparring)</div>
-        <textarea id="ai_log_input" placeholder="Fx: 'Vægten føltes let i dag, skal jeg øge?'"></textarea>
+        <textarea id="ai_log_input" placeholder="Fx: 'Hvordan føles vægten i dag?'"></textarea>
         <div id="ai-response-box"></div>
     </div>
 
@@ -128,7 +130,7 @@
             <button class="action-btn btn-ai" onclick="askGemini()">[Spørg Gemini]</button>
             <button class="action-btn btn-export" onclick="exportData()">[Log]</button>
         </div>
-        <div id="version-info" onclick="toggleSettings()">V2.7 | Indstillinger ⚙️</div>
+        <div id="version-info" onclick="toggleSettings()">V2.9 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:15px; border-top: 1px dashed #444; margin-top: 10px;">
             <input type="text" id="api_key_input" placeholder="Indsæt din AI nøgle her...">
@@ -144,76 +146,64 @@
 <script>
     const exercises = [
         { id: 'cardio', name: 'Løbebånd (Varme)', type: 'cardio', info: '1 min løb / 2 min gang (x 3-4).' },
-        { id: 'benpres', name: 'Siddende Benpres', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Pres lænden tilbage.' },
-        { id: 'brystpres', name: 'Siddende Brystpres', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Kontrolleret.' },
-        { id: 'rygtraek', name: 'Rygtræk m. bryststøtte', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Støt brystet.' },
-        { id: 'traekned', name: 'Træk til bryst (Lat)', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Sid fast.' },
-        { id: 'benstraek', name: 'Benstræk (Leg Ext)', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Isoler forlåret.' }
+        { id: 'benpres', name: 'Siddende Benpres', type: 'strength', sets: 3, info: 'Pres lænden tilbage.' },
+        { id: 'brystpres', name: 'Siddende Brystpres', type: 'strength', sets: 3, info: 'Kontrolleret.' },
+        { id: 'rygtraek', name: 'Rygtræk m. bryststøtte', type: 'strength', sets: 3, info: 'Støt brystet.' },
+        { id: 'traekned', name: 'Træk til bryst (Lat)', type: 'strength', sets: 3, info: 'Sid fast.' },
+        { id: 'benstraek', name: 'Benstræk (Leg Ext)', type: 'strength', sets: 3, info: 'Isoler forlåret.' }
     ];
 
     let currentWeekOffset = 0;
 
-    // --- AI LOGIK (V2.7 AUTO-RECOVERY) ---
+    // --- AI LOGIK (V2.9 TIER-1 FIX) ---
     async function askGemini() {
         const key = (localStorage.getItem('gemini_api_key_V2') || "").trim();
-        if (!key || key.length < 10) { alert("Indsæt nøgle i indstillinger."); toggleSettings(); return; }
+        if (!key || key.length < 10) { alert("Tjek nøgle i indstillinger."); toggleSettings(); return; }
         const userMsg = document.getElementById('ai_log_input').value;
         if (!userMsg) return;
 
         const responseBox = document.getElementById('ai-response-box');
         responseBox.style.display = 'block';
-        responseBox.innerText = "Forbinder til AI hjerne... 🤖";
+        responseBox.innerText = "Forbinder til Tier 1 hjerne... 🤖";
         responseBox.style.color = "var(--neon-green)";
 
-        // Liste over modeller vi prøver i rækkefølge
-        const modelsToTry = [
-            "gemini-1.5-flash",
-            "gemini-1.5-flash-latest",
-            "gemini-pro"
-        ];
-
-        const promptText = `Du er en personlig træner for Michael. Svar kort og motiverende på dansk. Michaels spørgsmål: ${userMsg}`;
-
-        for (const modelName of modelsToTry) {
+        // Vi prøver to forskellige model-strenge for at ramme rigtigt
+        const models = ["gemini-1.5-flash", "gemini-pro"];
+        
+        for (let model of models) {
             try {
-                // Vi prøver både v1 og v1beta automatisk
-                const versions = ["v1beta", "v1"];
-                for (const ver of versions) {
-                    const url = `https://generativelanguage.googleapis.com/${ver}/models/${modelName}:generateContent?key=${key}`;
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
-                    });
-                    
-                    const result = await response.json();
-                    if (!result.error) {
-                        responseBox.innerText = result.candidates[0].content.parts[0].text;
-                        return; // Succes! Vi stopper her.
-                    }
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: "Du er træner for Michael. Svar kort på: " + userMsg }] }] })
+                });
+                
+                const result = await response.json();
+                if (!result.error) {
+                    responseBox.innerText = result.candidates[0].content.parts[0].text;
+                    return; // Succes!
+                } else if (result.error.message.includes("API key not valid")) {
+                    responseBox.innerText = "FEJL: API-nøglen er ugyldig. Tjek om du har kopieret det hele.";
+                    return;
                 }
-            } catch (e) { console.log("Prøver næste model..."); }
+            } catch (e) { console.log("Prøver næste..."); }
         }
         
-        responseBox.innerText = "FEJL: Ingen modeller svarede. Tjek om din API nøgle er aktiv i Google AI Studio, eller opret en HELT NY nøgle i et 'New Project'.";
-        responseBox.style.color = "var(--neon-red)";
+        responseBox.innerText = "FEJL: Google kan ikke finde modellen for denne nøgle. Prøv at lave en helt ny nøgle i et 'New Project' i AI Studio.";
     }
 
-    // --- KALENDER & SYSTEM ---
+    // --- SYSTEM ---
     function toggleDay(id) {
         const el = document.getElementById(id);
         const weights = JSON.parse(localStorage.getItem('weight_logs_V3') || "{}");
         if (!el.classList.contains('active')) {
-            const weight = prompt("Vægt i dag? (Valgfrit)");
+            const weight = prompt("Vægt i dag?");
             if (weight) weights[id] = weight;
             el.classList.add('active');
-        } else {
-            el.classList.remove('active');
-            delete weights[id];
-        }
+        } else { el.classList.remove('active'); delete weights[id]; }
         localStorage.setItem('weight_logs_V3', JSON.stringify(weights));
-        setupCalendar();
-        saveData();
+        setupCalendar(); saveData();
     }
 
     function setupCalendar() {
@@ -244,15 +234,14 @@
 
     function toggleSettings() {
         const s = document.getElementById('settings-area');
-        const input = document.getElementById('api_key_input');
-        if (s.style.display === 'none') { s.style.display = 'block'; input.value = localStorage.getItem('gemini_api_key_V2') || ""; }
+        if (s.style.display === 'none') { s.style.display = 'block'; document.getElementById('api_key_input').value = localStorage.getItem('gemini_api_key_V2') || ""; }
         else { s.style.display = 'none'; }
     }
-    function saveKey() { localStorage.setItem('gemini_api_key_V2', document.getElementById('api_key_input').value.trim()); showToast("Nøgle Gemt!"); toggleSettings(); }
-    function deleteKey() { if(confirm("Slet nøgle?")) { localStorage.removeItem('gemini_api_key_V2'); document.getElementById('api_key_input').value = ""; showToast("Slettet!"); } }
+    function saveKey() { localStorage.setItem('gemini_api_key_V2', document.getElementById('api_key_input').value.trim()); showToast("Gemt!"); toggleSettings(); }
+    function deleteKey() { if(confirm("Slet?")) { localStorage.removeItem('gemini_api_key_V2'); document.getElementById('api_key_input').value = ""; showToast("Slettet!"); } }
     function getWeekNumber(d) { d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7)); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil(((d - yearStart) / 86400000 + 1)/7); }
     function changeWeek(offset) { currentWeekOffset += offset; setupCalendar(); }
-    function startTimer() { let timeLeft = 90; const btn = document.getElementById('timer-btn'); const fill = document.getElementById('timer-fill'); const timerInterval = setInterval(() => { timeLeft--; btn.innerText = `PAUSE: ${timeLeft} SEK`; fill.style.width = ((90 - timeLeft) / 90 * 100) + "%"; if(timeLeft <= 0) { clearInterval(timerInterval); btn.innerText = "KLAR!"; fill.style.width = "100%"; } }, 1000); }
+    function startTimer() { let timeLeft = 90; const btn = document.getElementById('timer-btn'); const fill = document.getElementById('timer-fill'); const t = setInterval(() => { timeLeft--; btn.innerText = `PAUSE: ${timeLeft} SEK`; fill.style.width = ((90 - timeLeft) / 90 * 100) + "%"; if(timeLeft <= 0) { clearInterval(t); btn.innerText = "KLAR!"; fill.style.width = "100%"; } }, 1000); }
     function toggleInfo(id) { document.getElementById(`${id}_info_box`).classList.toggle('show'); }
     function setStatus(exId, color) { ['g','y','r'].forEach(c => { const el = document.getElementById(`${exId}_status_${c}`); if(el) el.className = 'status-btn'; }); document.getElementById(`${exId}_status_${color.charAt(0)}`).classList.add('active-' + color.charAt(0)); document.getElementById(`${exId}_status_val`).value = color; }
 
@@ -273,7 +262,7 @@
     }
 
     function updateProgress() { let done = 0; exercises.forEach(ex => { if(document.getElementById(`${ex.id}_check`).checked) done++; }); document.getElementById('progress-bar').style.width = (done / exercises.length * 100) + "%"; }
-    function saveData() { let activeDays = []; document.querySelectorAll('.day-box.active').forEach(db => activeDays.push(db.id)); localStorage.setItem('calendar_V3', JSON.stringify(activeDays)); let data = { date: new Date().toLocaleDateString('da-DK'), exercises: {} }; exercises.forEach(ex => { data.exercises[ex.id] = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value }; }); localStorage.setItem('workoutData_V3', JSON.stringify(data)); showToast("DATA GEMT"); }
+    function saveData() { let activeDays = []; document.querySelectorAll('.day-box.active').forEach(db => activeDays.push(db.id)); localStorage.setItem('calendar_V3', JSON.stringify(activeDays)); let data = { exercises: {} }; exercises.forEach(ex => { data.exercises[ex.id] = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value }; }); localStorage.setItem('workoutData_V3', JSON.stringify(data)); showToast("DATA GEMT"); }
     function loadData() { const saved = localStorage.getItem('workoutData_V3'); if (!saved) return; const data = JSON.parse(saved); exercises.forEach(ex => { const ed = data.exercises[ex.id]; if(ed) { document.getElementById(`${ex.id}_check`).checked = ed.checked; if(ed.status) setStatus(ex.id, ed.status); } }); updateProgress(); }
     function exportData() { saveData(); showToast("KOPIERET"); }
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 2000); }
