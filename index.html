@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - V1.6</title>
+    <title>Fitness Master 3000 - V1.7</title>
     
     <style>
         :root {
@@ -32,17 +32,21 @@
             font-weight: bold;
         }
 
-        h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 15px; }
+        h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 10px; }
         
-        /* Kalender */
-        .calendar-container {
-            background-color: #000;
-            border: 2px solid var(--neon-purple);
-            padding: 10px;
+        /* Coach Fokus Boks */
+        .coach-focus-box {
+            background-color: rgba(255, 140, 0, 0.1);
+            border: 2px solid var(--neon-orange);
+            padding: 15px;
             margin-bottom: 20px;
             border-radius: 4px;
-            box-shadow: 4px 4px 0px var(--neon-purple);
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.8);
         }
+        .coach-focus-title { color: var(--neon-orange); font-size: 0.8em; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+
+        /* Kalender */
+        .calendar-container { background-color: #000; border: 2px solid var(--neon-purple); padding: 10px; margin-bottom: 20px; border-radius: 4px; box-shadow: 4px 4px 0px var(--neon-purple); }
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; color: var(--neon-purple); margin-bottom: 10px; text-transform: uppercase; font-size: 0.9em; }
         .nav-btn { background: #111; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 5px 15px; cursor: pointer; font-family: inherit; }
         .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
@@ -60,30 +64,15 @@
         .timer-bar-fill { width: 0%; height: 100%; background-color: var(--neon-orange); transition: width 1s linear; }
 
         /* Øvelseskort */
-        .exercise-card {
-            background-color: var(--card-bg);
-            padding: 15px; margin-bottom: 25px;
-            border-left: 6px solid var(--muted-text); 
-            box-shadow: var(--retro-shadow);
-            position: relative;
-        }
-        
+        .exercise-card { background-color: var(--card-bg); padding: 15px; margin-bottom: 25px; border-left: 6px solid var(--muted-text); box-shadow: var(--retro-shadow); position: relative; }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .info-btn { background: #000; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 4px 8px; font-size: 0.7em; cursor: pointer; font-family: inherit; text-transform: uppercase; }
 
-        /* Info Boks */
-        .info-box {
-            display: none;
-            background-color: #000;
-            border: 1px solid var(--neon-cyan);
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 0.85em;
-            color: var(--text-color);
-            line-height: 1.4;
-        }
+        /* Info Boks Justeret */
+        .info-box { display: none; background-color: #000; border: 1px solid var(--neon-cyan); padding: 12px; margin: 10px 0; font-size: 0.85em; color: var(--text-color); line-height: 1.4; }
         .info-box.show { display: block; }
-        .info-box strong { color: var(--neon-cyan); }
+        .coach-adjustment { border-top: 1px dashed var(--neon-orange); margin-top: 10px; padding-top: 10px; color: var(--neon-orange); }
+        .coach-adjustment strong { color: var(--neon-orange); text-shadow: 0 0 3px var(--neon-orange); }
 
         .status-group { display: flex; gap: 5px; margin-bottom: 15px; }
         .status-btn { flex: 1; background-color: #000; border: 1px solid var(--muted-text); color: var(--muted-text); padding: 8px 0; font-family: inherit; font-size: 0.75em; font-weight: bold; cursor: pointer; }
@@ -93,7 +82,7 @@
 
         .set-row { margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px; }
         .set-inputs { display: flex; align-items: center; justify-content: space-between; }
-        .pause-reminder { font-size: 0.7em; color: var(--neon-yellow); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .pause-reminder { font-size: 0.7em; color: var(--neon-yellow); margin-top: 5px; text-transform: uppercase; }
         .ghost-text { font-size: 0.7em; color: var(--muted-text); font-style: italic; margin-top: 2px; }
         
         input[type="number"] { width: 65px; padding: 8px; background-color: #000; border: 2px solid var(--muted-text); color: var(--neon-yellow); text-align: center; font-family: inherit; font-size: 16px; }
@@ -116,6 +105,13 @@
 <body>
 
     <h1>Fitness Master</h1>
+
+    <div class="coach-focus-box">
+        <div class="coach-focus-title"><span>⚠️</span> AKTIVE JUSTERINGER:</div>
+        <div id="global-coach-advice" style="font-size: 0.85em; line-height: 1.4;">
+            Velkommen til V1.7. Her vil jeg skrive de vigtigste fokuspunkter til din næste træning, når du har sendt mig dine data.
+        </div>
+    </div>
     
     <div class="calendar-container">
         <div class="calendar-nav">
@@ -136,8 +132,8 @@
     <div id="workout-container"></div>
 
     <div class="ai-log-section">
-        <div class="ai-log-title"><span>🤖</span> AI-SPARRING / DAGSFORM</div>
-        <textarea id="ai_log_input" placeholder="Skriv dagsform eller spørgsmål her..."></textarea>
+        <div class="ai-log-title"><span>🤖</span> DIN FEEDBACK TIL TRÆNER</div>
+        <textarea id="ai_log_input" placeholder="Hvordan føles kroppen? Var vægten for let/tung?"></textarea>
     </div>
 
     <div class="bottom-fixed-container">
@@ -145,54 +141,32 @@
             <button class="action-btn btn-save" onclick="saveData()">[Gem Data]</button>
             <button class="action-btn btn-export" onclick="exportData()">[Send til AI]</button>
         </div>
-        <div id="version-info">V1.6 | Henter...</div>
+        <div id="version-info">V1.7 | Henter...</div>
     </div>
 
     <div id="toast">DATA GEMT</div>
 
 <script>
+    // -------------------------------------------------------------------
+    // COACHENS NOTER - HER INDSÆTTER JEG MINE RÅD TIL DIG
+    // -------------------------------------------------------------------
+    const coachAdjustments = {
+        global: "Fokus i dag: Kontrolleret tempo. Mærk bryststøtten i rygtræk. Husk 90 sek pause hver gang!",
+        cardio: "GØR DETTE: Hvis du mærker det mindste i halebenet, så gå over til incline-walk med det samme.",
+        benpres: "", // Tomme felter vises ikke
+        brystpres: "",
+        rygtraek: "GØR DETTE: Træk med albuerne, ikke med hænderne. Hold spændet i 1 sek i toppen.",
+        traekned: "",
+        benstraek: ""
+    };
+
     const exercises = [
-        { 
-            id: 'cardio', 
-            name: 'Løbebånd (Varme)', 
-            type: 'cardio', 
-            info: '<strong>Opvarmning:</strong> 0-5 min rask gang.<br><strong>Intervaller:</strong> 1 min løb / 2 min gang (gentag 3-4 gange).<br><strong>Nedkøling:</strong> 15-20 min rolig gang.<br><br><strong>Tip:</strong> Ved stød i halebenet: Stop løb, skru op for hældning (incline) og gå hurtigt.' 
-        },
-        { 
-            id: 'benpres', 
-            name: 'Siddende Benpres', 
-            type: 'strength', 
-            sets: 3, 
-            info: '<strong>Hvorfor:</strong> Træner lår og baller. Sædet skåner rygsøjlen.<br><strong>Husk:</strong> Press lænden helt tilbage i sædet.<br><br><strong>Mål:</strong> 3 sæt x 10-12 reps. De sidste 2 skal være hårde!' 
-        },
-        { 
-            id: 'brystpres', 
-            name: 'Siddende Brystpres', 
-            type: 'strength', 
-            sets: 3, 
-            info: '<strong>Hvorfor:</strong> Træner bryst, skuldre og triceps. Ryggen er støttet af lænet.<br><strong>Husk:</strong> Kontrolleret bevægelse.<br><br><strong>Mål:</strong> 3 sæt x 10-12 reps. De sidste 2 skal være hårde!' 
-        },
-        { 
-            id: 'rygtraek', 
-            name: 'Rygtræk m. bryststøtte', 
-            type: 'strength', 
-            sets: 3, 
-            info: '<strong>Hvorfor:</strong> Træner ryggens tykkelse og holdning.<br><strong>Husk:</strong> Støt brystet mod pladen for at aflaste lænden.<br><br><strong>Mål:</strong> 3 sæt x 10-12 reps. De sidste 2 skal være hårde!' 
-        },
-        { 
-            id: 'traekned', 
-            name: 'Træk til bryst (Lat)', 
-            type: 'strength', 
-            sets: 3, 
-            info: '<strong>Hvorfor:</strong> Træner den brede rygmuskel.<br><strong>Husk:</strong> Sid fast under puderne. Læn dig kun lidt tilbage.<br><br><strong>Mål:</strong> 3 sæt x 10-12 reps. De sidste 2 skal være hårde!' 
-        },
-        { 
-            id: 'benstraek', 
-            name: 'Benstræk (Leg Ext)', 
-            type: 'strength', 
-            sets: 3, 
-            info: '<strong>Hvorfor:</strong> Isolerer forlåret. Meget sikker øvelse.<br><strong>Husk:</strong> Sid ned og stræk roligt underbenet opad.<br><br><strong>Mål:</strong> 3 sæt x 10-12 reps. De sidste 2 skal være hårde!' 
-        }
+        { id: 'cardio', name: 'Løbebånd (Varme)', type: 'cardio', info: '<strong>Intervaller:</strong> 1 min løb / 2 min gang (gentag 3-4 gange).<br><strong>Ved smerte:</strong> Skru op for incline og gå.' },
+        { id: 'benpres', name: 'Siddende Benpres', type: 'strength', sets: 3, info: '<strong>Husk:</strong> Press lænden helt tilbage i sædet. De sidste 2 reps skal være hårde!' },
+        { id: 'brystpres', name: 'Siddende Brystpres', type: 'strength', sets: 3, info: '<strong>Husk:</strong> Kontrolleret bevægelse fremad. Ryggen helt mod lænet.' },
+        { id: 'rygtraek', name: 'Rygtræk m. bryststøtte', type: 'strength', sets: 3, info: '<strong>Hvorfor:</strong> Aflaster lænden helt. Træk dine skuldre tilbage.' },
+        { id: 'traekned', name: 'Træk til bryst (Lat)', type: 'strength', sets: 3, info: '<strong>Husk:</strong> Træk stangen ned til toppen af brystet. Læn dig kun lidt tilbage.' },
+        { id: 'benstraek', name: 'Benstræk (Leg Ext)', type: 'strength', sets: 3, info: '<strong>Husk:</strong> Isolerer forlåret. Meget sikker øvelse.' }
     ];
 
     let currentWeekOffset = 0;
@@ -204,10 +178,7 @@
         return Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
     }
 
-    function changeWeek(offset) {
-        currentWeekOffset += offset;
-        setupCalendar();
-    }
+    function changeWeek(offset) { currentWeekOffset += offset; setupCalendar(); }
 
     function setupCalendar() {
         const grid = document.getElementById('week-grid');
@@ -243,18 +214,11 @@
             timeLeft--;
             btn.innerText = `Pause: ${timeLeft} sek`;
             fill.style.width = ((90 - timeLeft) / 90 * 100) + "%";
-            if(timeLeft <= 0) {
-                clearInterval(timerInterval);
-                btn.innerText = "KLAR!";
-                fill.style.width = "100%";
-            }
+            if(timeLeft <= 0) { clearInterval(timerInterval); btn.innerText = "KLAR!"; fill.style.width = "100%"; }
         }, 1000);
     }
 
-    function toggleInfo(id) {
-        const box = document.getElementById(`${id}_info_box`);
-        box.classList.toggle('show');
-    }
+    function toggleInfo(id) { document.getElementById(`${id}_info_box`).classList.toggle('show'); }
 
     function setStatus(exId, color) {
         ['g','y','r'].forEach(c => document.getElementById(`${exId}_status_${c}`).className = 'status-btn');
@@ -264,15 +228,25 @@
 
     function renderApp() {
         const container = document.getElementById('workout-container');
+        document.getElementById('global-coach-advice').innerText = coachAdjustments.global;
+
         exercises.forEach((ex, index) => {
             const card = document.createElement('div');
             card.className = `exercise-card`;
+            
+            // Tjek om der er specifik coach feedback til denne øvelse
+            const adjustmentHtml = coachAdjustments[ex.id] ? 
+                `<div class="coach-adjustment"><strong>NYT:</strong> ${coachAdjustments[ex.id]}</div>` : '';
+
             let content = `
                 <div class="card-header">
                     <div style="color:var(--neon-cyan);">${index+1}. ${ex.name}</div>
                     <button class="info-btn" onclick="toggleInfo('${ex.id}')">ℹ️ Info</button>
                 </div>
-                <div class="info-box" id="${ex.id}_info_box">${ex.info}</div>
+                <div class="info-box" id="${ex.id}_info_box">
+                    ${ex.info}
+                    ${adjustmentHtml}
+                </div>
                 <div class="status-group">
                     <button class="status-btn" id="${ex.id}_status_g" onclick="setStatus('${ex.id}', 'green')">🟢 OK</button>
                     <button class="status-btn" id="${ex.id}_status_y" onclick="setStatus('${ex.id}', 'yellow')">🟡 ØM</button>
@@ -287,23 +261,17 @@
                         <div class="set-row">
                             <div class="set-inputs">
                                 <span>Sæt ${i}</span>
-                                <div>
-                                    <input type="number" id="${ex.id}_s${i}_kg" placeholder="KG"> x 
-                                    <input type="number" id="${ex.id}_s${i}_reps" placeholder="REPS">
-                                </div>
+                                <div><input type="number" id="${ex.id}_s${i}_kg" placeholder="KG"> x <input type="number" id="${ex.id}_s${i}_reps" placeholder="REPS"></div>
                             </div>
                             <div class="ghost-text" id="${ex.id}_s${i}_ghost"></div>
-                            <div class="pause-reminder">>> Husk 1-1,5 min pause!</div>
+                            <div class="pause-reminder">>> Husk 90 sek pause!</div>
                         </div>
                     `;
                 }
             } else {
                 content += `
                     <div class="set-row">
-                        <div class="set-inputs">
-                            <span>Tid (min)</span>
-                            <input type="number" id="${ex.id}_time" placeholder="MIN">
-                        </div>
+                        <div class="set-inputs"><span>Tid (min)</span><input type="number" id="${ex.id}_time" placeholder="MIN"></div>
                         <div class="ghost-text" id="${ex.id}_ghost"></div>
                     </div>
                 `;
@@ -327,12 +295,12 @@
     }
 
     function saveData() {
-        let activeDays = JSON.parse(localStorage.getItem('calendar_V1_6') || "[]");
+        let activeDays = JSON.parse(localStorage.getItem('calendar_V1_7') || "[]");
         document.querySelectorAll('.day-box').forEach(db => {
             if(db.classList.contains('active') && !activeDays.includes(db.id)) activeDays.push(db.id);
             else if(!db.classList.contains('active') && activeDays.includes(db.id)) activeDays = activeDays.filter(a => a !== db.id);
         });
-        localStorage.setItem('calendar_V1_6', JSON.stringify(activeDays));
+        localStorage.setItem('calendar_V1_7', JSON.stringify(activeDays));
         let data = { date: new Date().toLocaleDateString('da-DK'), ai_log: document.getElementById('ai_log_input').value, exercises: {} };
         exercises.forEach(ex => {
             let exData = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value, note: document.getElementById(`${ex.id}_note`).value };
@@ -345,17 +313,17 @@
             } else { exData.time = document.getElementById(`${ex.id}_time`).value; }
             data.exercises[ex.id] = exData;
         });
-        localStorage.setItem('workoutData_V1_6', JSON.stringify(data));
+        localStorage.setItem('workoutData_V1_7', JSON.stringify(data));
         showToast("DATA GEMT");
     }
 
     function loadCalendarState() {
-        let activeDays = JSON.parse(localStorage.getItem('calendar_V1_6') || "[]");
+        let activeDays = JSON.parse(localStorage.getItem('calendar_V1_7') || "[]");
         activeDays.forEach(id => { if(document.getElementById(id)) document.getElementById(id).classList.add('active'); });
     }
 
     function loadData() {
-        const saved = localStorage.getItem('workoutData_V1_6');
+        const saved = localStorage.getItem('workoutData_V1_7');
         if (!saved) return;
         const data = JSON.parse(saved);
         const isToday = data.date === new Date().toLocaleDateString('da-DK');
@@ -384,15 +352,15 @@
 
     function exportData() {
         saveData();
-        const data = JSON.parse(localStorage.getItem('workoutData_V1_6'));
+        const data = JSON.parse(localStorage.getItem('workoutData_V1_7'));
         let txt = `LOG ${data.date} | MichaelKHans\n-------------------\n`;
-        txt += `AI NOTER: ${data.ai_log || 'Ingen'}\n\n`;
+        txt += `FEEDBACK TIL AI: ${data.ai_log || 'Ingen'}\n\n`;
         exercises.forEach(ex => {
             const ed = data.exercises[ex.id];
             txt += `${ex.name}: `;
             if(ex.type === 'strength') { ed.sets.forEach((s, i) => { if(s.kg) txt += `S${i+1}: ${s.kg}x${s.reps} `; }); }
             else { txt += `${ed.time} min`; }
-            txt += ` [${ed.status || '?'}]\n`;
+            txt += ` [Status: ${ed.status || '?'}]\n`;
         });
         navigator.clipboard.writeText(txt);
         showToast("KOPIERET TIL AI");
@@ -406,9 +374,9 @@
             const data = await response.json();
             if (data[0]) {
                 const date = new Date(data[0].commit.author.date).toLocaleDateString('da-DK', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                document.getElementById('version-info').innerText = 'V1.6 | Opdateret ' + date;
+                document.getElementById('version-info').innerText = 'V1.7 | Opdateret ' + date;
             }
-        } catch (e) { document.getElementById('version-info').innerText = 'V1.6 | Offline'; }
+        } catch (e) { document.getElementById('version-info').innerText = 'V1.7 | Offline'; }
     }
 
     window.onload = () => { renderApp(); fetchLatestVersion(); };
