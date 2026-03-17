@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - V3.0 Universal</title>
+    <title>Fitness Master 3000 - V3.1 Diagnostic</title>
     
     <style>
         :root {
@@ -14,7 +14,7 @@
             --font-family: 'Courier New', Courier, monospace;
         }
 
-        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; padding-bottom: 280px; box-sizing: border-box; font-weight: bold; }
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; padding-bottom: 300px; box-sizing: border-box; font-weight: bold; }
         h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 15px; }
         
         .calendar-container { background-color: #000; border: 2px solid var(--neon-purple); padding: 10px; margin-bottom: 20px; border-radius: 4px; box-shadow: 4px 4px 0px var(--neon-purple); }
@@ -36,12 +36,12 @@
         .timer-bar-fill { width: 0%; height: 100%; background-color: var(--neon-orange); transition: width 1s linear; }
 
         .exercise-card { background-color: var(--card-bg); padding: 15px; margin-bottom: 25px; border-left: 10px solid var(--muted-text); box-shadow: var(--retro-shadow); position: relative; }
-        .card-0 { border-left-color: var(--neon-cyan) !important; } .card-0 .exercise-name { color: var(--neon-cyan) !important; text-shadow: 0 0 5px var(--neon-cyan); }
-        .card-1 { border-left-color: var(--neon-green) !important; } .card-1 .exercise-name { color: var(--neon-green) !important; text-shadow: 0 0 5px var(--neon-green); }
-        .card-2 { border-left-color: var(--neon-purple) !important; } .card-2 .exercise-name { color: var(--neon-purple) !important; text-shadow: 0 0 5px var(--neon-purple); }
-        .card-3 { border-left-color: var(--neon-orange) !important; } .card-3 .exercise-name { color: var(--neon-orange) !important; text-shadow: 0 0 5px var(--neon-orange); }
-        .card-4 { border-left-color: var(--neon-yellow) !important; } .card-4 .exercise-name { color: var(--neon-yellow) !important; text-shadow: 0 0 5px var(--neon-yellow); }
-        .card-5 { border-left-color: var(--neon-red) !important; } .card-5 .exercise-name { color: var(--neon-red) !important; text-shadow: 0 0 5px var(--neon-red); }
+        .card-0 { border-left-color: var(--neon-cyan) !important; } .card-0 .exercise-name { color: var(--neon-cyan) !important; }
+        .card-1 { border-left-color: var(--neon-green) !important; } .card-1 .exercise-name { color: var(--neon-green) !important; }
+        .card-2 { border-left-color: var(--neon-purple) !important; } .card-2 .exercise-name { color: var(--neon-purple) !important; }
+        .card-3 { border-left-color: var(--neon-orange) !important; } .card-3 .exercise-name { color: var(--neon-orange) !important; }
+        .card-4 { border-left-color: var(--neon-yellow) !important; } .card-4 .exercise-name { color: var(--neon-yellow) !important; }
+        .card-5 { border-left-color: var(--neon-red) !important; } .card-5 .exercise-name { color: var(--neon-red) !important; }
 
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .info-btn { background: #000; color: #fff; border: 1px solid #555; padding: 4px 8px; font-size: 0.7em; cursor: pointer; font-family: inherit; }
@@ -58,17 +58,22 @@
         #api_key_input { width: 100%; box-sizing: border-box; text-align: left; font-size: 11px; margin-bottom: 10px; border-color: var(--neon-cyan); color: var(--neon-cyan); }
         textarea { width: 100%; padding: 10px; background-color: #000; border: 1px solid var(--muted-text); color: #fff; margin-top: 5px; font-family: inherit; box-sizing: border-box; }
 
+        /* AI LOG SEKTION */
         .ai-log-section { background-color: #000; border: 2px solid var(--neon-cyan); padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--neon-cyan); }
         #ai-response-box { display: none; background-color: #111; border: 1px solid var(--neon-green); padding: 12px; margin-top: 15px; color: var(--neon-green); font-size: 0.85em; line-height: 1.5; }
+        
+        /* DIAGNOSTIK LOG */
+        #diagnostic-log { display: none; background-color: #000; color: #aaa; font-size: 0.65em; padding: 10px; border: 1px dashed #444; margin-top: 10px; white-space: pre-wrap; overflow-x: auto; }
 
         .bottom-fixed-container { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); padding: 15px; border-top: 2px solid #333; z-index: 1000; }
         .btn-container { display: flex; gap: 10px; flex-wrap: wrap; }
         button.action-btn { flex: 1; min-width: 120px; padding: 15px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-family: inherit; border-radius: 4px; }
         .btn-save { background: #000; color: var(--neon-green); border: 2px solid var(--neon-green); }
         .btn-ai { background: var(--neon-cyan); color: #000; border: none; }
-        .btn-export { background: var(--neon-purple); color: #fff; border: none; }
+        .btn-diag { background: #222; color: var(--muted-text); border: 1px solid #444; font-size: 0.7em; }
+        
         #version-info { text-align: center; font-size: 0.7em; color: #555; margin-top: 10px; cursor: pointer; }
-        #toast { visibility: hidden; position: fixed; left: 50%; bottom: 200px; transform: translateX(-50%); background: var(--neon-cyan); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; }
+        #toast { visibility: hidden; position: fixed; left: 50%; bottom: 220px; transform: translateX(-50%); background: var(--neon-cyan); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; }
         #toast.show { visibility: visible; }
     </style>
 </head>
@@ -100,18 +105,19 @@
         <div style="color:var(--neon-cyan); font-size:0.8em; text-transform:uppercase; margin-bottom:8px;">🤖 SPØRG GEMINI (Live Sparring)</div>
         <textarea id="ai_log_input" placeholder="Fx: 'Hvordan føles vægten i dag?'"></textarea>
         <div id="ai-response-box"></div>
+        <button class="action-btn btn-diag" style="margin-top:10px; width:100%;" onclick="toggleLog()">[ Vis System Log ]</button>
+        <div id="diagnostic-log">Log er tom...</div>
     </div>
 
     <div class="bottom-fixed-container">
         <div class="btn-container">
             <button class="action-btn btn-save" onclick="saveData()">[Gem]</button>
             <button class="action-btn btn-ai" onclick="askGemini()">[Spørg Gemini]</button>
-            <button class="action-btn btn-export" onclick="exportData()">[Log]</button>
         </div>
-        <div id="version-info" onclick="toggleSettings()">V3.0 | Indstillinger ⚙️</div>
+        <div id="version-info" onclick="toggleSettings()">V3.1 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:15px; border-top: 1px dashed #444; margin-top: 10px;">
-            <input type="text" id="api_key_input" placeholder="Indsæt din Tier 1 nøgle her...">
+            <input type="text" id="api_key_input" placeholder="Indsæt AI nøgle her...">
             <div style="display: flex; gap: 5px;">
                 <button class="action-btn btn-save" style="padding:10px; flex: 2;" onclick="saveKey()">Gem Nøgle</button>
                 <button class="action-btn" style="padding:10px; flex: 1; background: #222; color: var(--neon-red); border: 1px solid var(--neon-red);" onclick="deleteKey()">Slet</button>
@@ -124,60 +130,70 @@
 <script>
     const exercises = [
         { id: 'cardio', name: 'Løbebånd (Varme)', type: 'cardio', info: '1 min løb / 2 min gang (x 3-4).' },
-        { id: 'benpres', name: 'Siddende Benpres', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Pres lænden tilbage.' },
-        { id: 'brystpres', name: 'Siddende Brystpres', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Kontrolleret.' },
-        { id: 'rygtraek', name: 'Rygtræk m. bryststøtte', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Støt brystet.' },
-        { id: 'traekned', name: 'Træk til bryst (Lat)', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Sid fast.' },
-        { id: 'benstraek', name: 'Benstræk (Leg Ext)', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Isoler forlåret.' }
+        { id: 'benpres', name: 'Siddende Benpres', type: 'strength', sets: 3, info: 'Pres lænden tilbage.' },
+        { id: 'brystpres', name: 'Siddende Brystpres', type: 'strength', sets: 3, info: 'Kontrolleret.' },
+        { id: 'rygtraek', name: 'Rygtræk m. bryststøtte', type: 'strength', sets: 3, info: 'Støt brystet.' },
+        { id: 'traekned', name: 'Træk til bryst (Lat)', type: 'strength', sets: 3, info: 'Sid fast.' },
+        { id: 'benstraek', name: 'Benstræk (Leg Ext)', type: 'strength', sets: 3, info: 'Isoler forlåret.' }
     ];
 
     let currentWeekOffset = 0;
+    let fullLog = "";
 
-    // --- AI LOGIK (V3.0 UNIVERSAL BRIDGE) ---
-    async function askGemini() {
-        const key = (localStorage.getItem('gemini_api_key_V2') || "").trim();
-        if (!key || key.length < 10) { alert("Tjek nøgle i indstillinger."); toggleSettings(); return; }
-        const userMsg = document.getElementById('ai_log_input').value;
-        if (!userMsg) return;
-
-        const responseBox = document.getElementById('ai-response-box');
-        responseBox.style.display = 'block';
-        responseBox.innerText = "Forbinder til Tier 1 AI... 🤖";
-        responseBox.style.color = "var(--neon-green)";
-
-        // Vi prøver de to mest sikre versioner for Tier 1 konti
-        const config = [
-            { ver: "v1beta", model: "gemini-1.5-flash" },
-            { ver: "v1", model: "gemini-1.5-flash" },
-            { ver: "v1beta", model: "gemini-pro" }
-        ];
-
-        for (let attempt of config) {
-            try {
-                const url = `https://generativelanguage.googleapis.com/${attempt.ver}/models/${attempt.model}:generateContent?key=${key}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: "Du er træner for Michael. Svar kort på: " + userMsg }] }] })
-                });
-                
-                const result = await response.json();
-                if (!result.error) {
-                    responseBox.innerText = result.candidates[0].content.parts[0].text;
-                    return; // Succes!
-                } else {
-                    console.log(`Prøvede ${attempt.model} via ${attempt.ver}, men fejlede.`);
-                    // Vi viser den rå fejl hvis alle forsøg slår fejl senere
-                    lastError = result.error.message;
-                }
-            } catch (e) { console.log("Netværksfejl i forsøg..."); }
-        }
-        
-        responseBox.innerText = "FEJL FRA GOOGLE: " + (typeof lastError !== 'undefined' ? lastError : "Ingen kontakt.");
-        responseBox.style.color = "var(--neon-red)";
+    function logToSystem(msg) {
+        fullLog += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+        document.getElementById('diagnostic-log').innerText = fullLog;
     }
 
-    // --- SYSTEM FUNKTIONER ---
+    function toggleLog() {
+        const log = document.getElementById('diagnostic-log');
+        log.style.display = log.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // --- AI LOGIK (V3.1 DIAGNOSTIC) ---
+    async function askGemini() {
+        const key = (localStorage.getItem('gemini_api_key_V2') || "").trim();
+        if (!key) { alert("Mangler nøgle!"); return; }
+        
+        const userMsg = document.getElementById('ai_log_input').value;
+        const responseBox = document.getElementById('ai-response-box');
+        responseBox.style.display = 'block';
+        responseBox.innerText = "Prøver forbindelse... 🤖";
+        
+        logToSystem("Starter anmodning...");
+        logToSystem("Nøgle fundet (længde: " + key.length + ")");
+
+        // Prøver den absolut mest rå adresse til v1beta
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+        
+        logToSystem("URL: " + url.split('?')[0] + "?key=HIDDEN");
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: userMsg || "Hej" }] }] })
+            });
+            
+            logToSystem("Status: " + response.status + " " + response.statusText);
+            
+            const result = await response.json();
+            logToSystem("Rå svar: " + JSON.stringify(result, null, 2));
+
+            if (result.error) {
+                responseBox.innerText = "FEJL: " + result.error.message;
+                responseBox.style.color = "var(--neon-red)";
+            } else {
+                responseBox.innerText = result.candidates[0].content.parts[0].text;
+                responseBox.style.color = "var(--neon-green)";
+            }
+        } catch (e) {
+            logToSystem("CRITICAL ERROR: " + e.message);
+            responseBox.innerText = "SYSTEMFEJL. Se log.";
+        }
+    }
+
+    // --- KALENDER & SYSTEM ---
     function toggleDay(id) {
         const el = document.getElementById(id);
         const weights = JSON.parse(localStorage.getItem('weight_logs_V3') || "{}");
@@ -248,7 +264,6 @@
     function updateProgress() { let done = 0; exercises.forEach(ex => { if(document.getElementById(`${ex.id}_check`).checked) done++; }); document.getElementById('progress-bar').style.width = (done / exercises.length * 100) + "%"; }
     function saveData() { let activeDays = []; document.querySelectorAll('.day-box.active').forEach(db => activeDays.push(db.id)); localStorage.setItem('calendar_V3', JSON.stringify(activeDays)); let data = { date: new Date().toLocaleDateString('da-DK'), exercises: {} }; exercises.forEach(ex => { data.exercises[ex.id] = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value }; }); localStorage.setItem('workoutData_V3', JSON.stringify(data)); showToast("DATA GEMT"); }
     function loadData() { const saved = localStorage.getItem('workoutData_V3'); if (!saved) return; const data = JSON.parse(saved); exercises.forEach(ex => { const ed = data.exercises[ex.id]; if(ed) { document.getElementById(`${ex.id}_check`).checked = ed.checked; if(ed.status) setStatus(ex.id, ed.status); } }); updateProgress(); }
-    function exportData() { saveData(); showToast("KOPIERET"); }
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 2000); }
 
     window.onload = renderApp;
