@@ -3,27 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - Din Træning</title>
+    <title>Fitness Master 3000 - V1.4</title>
     
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-
     <style>
         :root {
             --bg-color: #0d1117; 
             --card-bg: #161b22;  
             --text-color: #e6edf3;
             --muted-text: #8b949e;
-            
             --neon-green: #39ff14;
             --neon-cyan: #00ffff;
             --neon-purple: #9d00ff;
             --neon-orange: #ff8c00;
             --neon-yellow: #ffff00;
-            
+            --neon-red: #ff003c;
             --retro-shadow: 6px 6px 0px rgba(0,0,0,0.8);
-            
             --font-family: 'Courier New', Courier, monospace;
         }
 
@@ -36,253 +30,151 @@
             padding-bottom: 160px; 
             box-sizing: border-box;
             font-weight: bold;
-            font-size: 16px;
         }
 
-        h1 {
-            text-align: center;
-            color: var(--neon-green);
-            text-transform: uppercase;
-            text-shadow: 0 0 5px var(--neon-green);
-            font-size: 1.6em;
-            margin-top: 10px;
-            letter-spacing: 1px;
-        }
+        h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 5px; }
         
-        .header-info {
-            text-align: center;
-            font-size: 0.9em;
-            color: var(--muted-text);
+        /* Kalender / Ugeskema */
+        .calendar-container {
+            background-color: #000;
+            border: 2px solid var(--neon-purple);
+            padding: 10px;
             margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 4px 4px 0px var(--neon-purple);
+        }
+        .calendar-header {
+            text-align: center;
+            color: var(--neon-purple);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .day-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 0;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7em;
+            background: #111;
+        }
+        .day-box.active {
+            border-color: var(--neon-green);
+            background-color: rgba(57, 255, 20, 0.1);
+            color: var(--neon-green);
+        }
+        .day-name { margin-bottom: 2px; }
+        .day-check { font-size: 1.2em; visibility: hidden; }
+        .day-box.active .day-check { visibility: visible; }
+
+        .creatine-box {
+            background-color: #000;
+            border: 2px dashed var(--neon-cyan);
+            padding: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
         }
 
-        #progress-container {
-            width: 100%;
-            background-color: #000;
-            border: 2px solid var(--muted-text);
-            height: 12px;
-            margin-bottom: 20px;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        #progress-container { width: 100%; background-color: #000; border: 2px solid var(--muted-text); height: 12px; margin-bottom: 15px; }
+        #progress-bar { width: 0%; height: 100%; background-color: var(--neon-cyan); transition: all 0.3s ease; }
+
+        .timer-container { margin-bottom: 25px; text-align: center; }
+        .timer-btn {
+            background-color: #000; color: var(--neon-orange); border: 2px solid var(--neon-orange);
+            padding: 10px; width: 100%; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer;
         }
-        #progress-bar {
-            width: 0%;
-            height: 100%;
-            background-color: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-            transition: width 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-        }
+        .timer-bar-bg { width: 100%; height: 8px; background-color: #000; border: 1px solid var(--muted-text); margin-top: 5px; }
+        .timer-bar-fill { width: 0%; height: 100%; background-color: var(--neon-orange); transition: width 1s linear; }
 
         .exercise-card {
             background-color: var(--card-bg);
-            border-radius: 4px; 
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 15px; margin-bottom: 25px;
             border-left: 6px solid var(--muted-text); 
             box-shadow: var(--retro-shadow);
         }
         
-        .card-0 { border-color: var(--neon-cyan); }   
-        .card-1 { border-color: var(--neon-green); }  
-        .card-2 { border-color: var(--neon-green); }  
-        .card-3 { border-color: var(--neon-purple); } 
-        .card-4 { border-color: var(--neon-purple); } 
+        .status-group { display: flex; gap: 5px; margin-bottom: 15px; }
+        .status-btn {
+            flex: 1; background-color: #000; border: 1px solid var(--muted-text); color: var(--muted-text);
+            padding: 8px 0; font-family: inherit; font-size: 0.8em; font-weight: bold; cursor: pointer;
+        }
+        .active-g { border-color: var(--neon-green) !important; color: var(--neon-green) !important; }
+        .active-y { border-color: var(--neon-yellow) !important; color: var(--neon-yellow) !important; }
+        .active-r { border-color: var(--neon-red) !important; color: var(--neon-red) !important; }
 
-        .exercise-title {
-            font-size: 1.1em;
-            text-transform: uppercase;
-            color: var(--text-color);
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            letter-spacing: 0.5px;
-        }
-        
-        .exercise-note-header {
-            font-size: 0.85em;
-            color: var(--muted-text);
-            margin-top: -5px;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        .target-reps {
-            font-size: 0.85em;
-            color: var(--neon-yellow);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 2px rgba(255,255,0,0.5);
-        }
-
-        .set-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.95em;
-        }
-        .input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+        .set-row { margin-bottom: 15px; }
+        .ghost-text { font-size: 0.75em; color: var(--muted-text); font-style: italic; margin-top: 2px; }
         
         input[type="number"] {
-            width: 75px;
-            padding: 10px;
-            background-color: #000;
-            border: 2px solid var(--muted-text);
-            color: var(--neon-yellow);
-            border-radius: 4px;
-            font-size: 16px; 
-            font-weight: bold;
-            text-align: center;
-            font-family: var(--font-family);
-        }
-        input[type="number"]:focus {
-            border-color: var(--neon-green);
-            outline: none;
-            box-shadow: 0 0 5px var(--neon-green);
+            width: 70px; padding: 10px; background-color: #000; border: 2px solid var(--muted-text);
+            color: var(--neon-yellow); text-align: center; font-family: inherit; font-size: 16px;
         }
         
-        textarea {
-            width: 100%;
-            padding: 12px;
-            background-color: #000;
-            border: 2px solid var(--muted-text);
-            color: var(--text-color);
-            border-radius: 4px;
-            margin-top: 10px;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 0.9em;
-            font-weight: bold;
-        }
-        textarea:focus {
-            border-color: var(--neon-green);
-            outline: none;
-        }
+        textarea { width: 100%; padding: 10px; background-color: #000; border: 1px solid var(--muted-text); color: #fff; margin-top: 5px; font-family: inherit; }
 
-        .check-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--muted-text);
-            font-size: 0.95em;
-            margin-top: 15px;
-            justify-content: flex-end;
-        }
-        input[type="checkbox"] {
-            transform: scale(1.5);
-            cursor: pointer;
-            accent-color: var(--neon-cyan);
-        }
-
-        .bottom-fixed-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--bg-color);
-            padding: 15px;
-            border-top: 3px solid var(--muted-text);
-            box-sizing: border-box;
-            z-index: 100;
-        }
-
-        .btn-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            margin-bottom: 12px;
-        }
-
-        button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 4px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-family: var(--font-family);
-            box-shadow: var(--retro-shadow);
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
-        }
-        button:active {
-            transform: translate(3px, 3px);
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.8);
-        }
-
-        .btn-save { 
-            background-color: #000;
-            color: var(--neon-green);
-            border: 2px solid var(--neon-green);
-        }
-        .btn-export { 
-            background-color: var(--neon-purple);
-            color: #fff;
-        }
-
-        #version-info {
-            text-align: center;
-            font-size: 0.8em;
-            color: #777;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .bottom-fixed-container { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); padding: 15px; border-top: 2px solid #333; }
+        .btn-container { display: flex; gap: 10px; }
+        button.action-btn { flex: 1; padding: 15px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-family: inherit; }
+        .btn-save { background: #000; color: var(--neon-green); border: 2px solid var(--neon-green); }
+        .btn-export { background: var(--neon-purple); color: #fff; border: none; }
+        #version-info { text-align: center; font-size: 0.7em; color: #555; margin-top: 10px; }
 
         #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: var(--neon-cyan);
-            color: #000;
-            text-align: center;
-            border-radius: 4px;
-            padding: 16px;
-            position: fixed;
-            z-index: 200;
-            left: 50%;
-            bottom: 130px;
-            transform: translateX(-50%);
-            font-weight: bold;
-            font-size: 1em;
-            text-transform: uppercase;
-            box-shadow: 0 0 15px var(--neon-cyan);
+            visibility: hidden; position: fixed; left: 50%; bottom: 120px; transform: translateX(-50%);
+            background: var(--neon-cyan); color: #000; padding: 10px 20px; font-weight: bold; z-index: 1000;
         }
-        #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.3s 2.7s; }
-        @keyframes fadein { from {bottom: 100px; opacity: 0;} to {bottom: 130px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 130px; opacity: 1;} to {bottom: 100px; opacity: 0;} }
+        #toast.show { visibility: visible; }
     </style>
 </head>
 <body>
 
-    <h1>Fitness Master 3000</h1>
-    <div class="header-info">Fokus: Skån ryg/haleben. Kontrollerede træk.</div>
+    <h1 id="app-title">Fitness Master</h1>
     
-    <div id="progress-container">
-        <div id="progress-bar"></div>
+    <div class="calendar-container">
+        <div class="calendar-header" id="week-display">Uge --</div>
+        <div class="week-grid" id="week-grid">
+            </div>
     </div>
 
-    <div id="workout-container">
-        </div>
+    <div class="creatine-box">
+        <input type="checkbox" id="creatine_check" onchange="updateProgress()">
+        <label for="creatine_check">3g Kreatin Indtaget</label>
+    </div>
+
+    <div id="progress-container"><div id="progress-bar"></div></div>
+
+    <div class="timer-container">
+        <button class="timer-btn" id="timer-btn" onclick="startTimer()">[ Start 90 sek Pause ]</button>
+        <div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-fill"></div></div>
+    </div>
+
+    <div id="workout-container"></div>
 
     <div class="bottom-fixed-container">
         <div class="btn-container">
-            <button class="btn-save" onclick="saveData()">[Gem Data]</button>
-            <button class="btn-export" onclick="exportData()">[Send til Træner]</button>
+            <button class="action-btn btn-save" onclick="saveData()">[Gem]</button>
+            <button class="action-btn btn-export" onclick="exportData()">[Send]</button>
         </div>
-        <div id="version-info">
-            Henter versionsdata...
-        </div>
+        <div id="version-info">V1.4 | Henter...</div>
     </div>
 
-    <div id="toast">SYSTEM: DATA GEMT!</div>
+    <div id="toast">SYSTEM OPPDATERET</div>
 
 <script>
     const exercises = [
-        // Her er den nye, præcise tekst til løbebåndet
         { id: 'cardio', name: 'Løbebånd (Varme)', type: 'cardio', note: '5 min gang. Derefter: 1 min løb / 2 min gang (x 3-4). Nedkøl: 5 min gang.' },
         { id: 'benpres', name: 'Siddende Benpres', type: 'strength', sets: 3, targetReps: '10-12' },
         { id: 'benstraek', name: 'Benstræk (Leg Ext)', type: 'strength', sets: 3, targetReps: '10-12' },
@@ -291,211 +183,176 @@
         { id: 'traekned', name: 'Træk til bryst (Lat)', type: 'strength', sets: 3, targetReps: '10-12' }
     ];
 
-    const container = document.getElementById('workout-container');
+    // Hjælper til dansk ugenummer
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+        return weekNo;
+    }
+
+    // Generer ugeskema
+    function setupCalendar() {
+        const grid = document.getElementById('week-grid');
+        const now = new Date();
+        document.getElementById('week-display').innerText = "UGE " + getWeekNumber(now);
+        
+        const dayNames = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
+        const monday = new Date(now);
+        monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+
+        grid.innerHTML = '';
+        for(let i=0; i<7; i++) {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            const dateStr = d.toLocaleDateString('da-DK', {day:'2-digit', month:'2-digit'});
+            const id = `day_${d.toISOString().split('T')[0]}`;
+            
+            const dayBox = document.createElement('div');
+            dayBox.className = 'day-box';
+            dayBox.id = id;
+            dayBox.innerHTML = `<span class="day-name">${dayNames[i]}</span><span style="font-size:0.8em">${dateStr}</span><span class="day-check">✓</span>`;
+            dayBox.onclick = () => toggleDay(id);
+            grid.appendChild(dayBox);
+        }
+    }
+
+    function toggleDay(id) {
+        document.getElementById(id).classList.toggle('active');
+        saveData();
+    }
+
+    let timerInterval;
+    function startTimer() {
+        clearInterval(timerInterval);
+        let btn = document.getElementById('timer-btn');
+        let fill = document.getElementById('timer-fill');
+        let timeLeft = 90;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            btn.innerText = `Pause: ${timeLeft} sek`;
+            fill.style.width = ((90 - timeLeft) / 90 * 100) + "%";
+            if(timeLeft <= 0) {
+                clearInterval(timerInterval);
+                btn.innerText = "KLAR!";
+                fill.style.width = "100%";
+            }
+        }, 1000);
+    }
+
+    function setStatus(exId, color) {
+        ['g','y','r'].forEach(c => document.getElementById(`${exId}_status_${c}`).className = 'status-btn');
+        document.getElementById(`${exId}_status_${color.charAt(0)}`).classList.add('active-' + color.charAt(0));
+        document.getElementById(`${exId}_status_val`).value = color;
+    }
 
     function renderApp() {
+        const container = document.getElementById('workout-container');
         exercises.forEach((ex, index) => {
             const card = document.createElement('div');
-            card.className = `exercise-card card-${index}`;
-            
-            let html = `
-                <div class="exercise-title">
-                    <span>${index + 1}. ${ex.name}</span>
+            card.className = `exercise-card`;
+            card.innerHTML = `
+                <div style="color:var(--neon-cyan); margin-bottom:10px;">${index+1}. ${ex.name}</div>
+                <div class="status-group">
+                    <button class="status-btn" id="${ex.id}_status_g" onclick="setStatus('${ex.id}', 'green')">🟢 OK</button>
+                    <button class="status-btn" id="${ex.id}_status_y" onclick="setStatus('${ex.id}', 'yellow')">🟡 ØM</button>
+                    <button class="status-btn" id="${ex.id}_status_r" onclick="setStatus('${ex.id}', 'red')">🔴 AV</button>
+                    <input type="hidden" id="${ex.id}_status_val">
                 </div>
-            `;
-            
-            if (ex.note) {
-                html += `<div class="exercise-note-header">${ex.note}</div>`;
-            }
-
-            if (ex.type === 'strength' && ex.targetReps) {
-                html += `<div class="target-reps">>> Mål: ${ex.targetReps} reps</div>`;
-            }
-            
-            if (ex.type === 'cardio') {
-                html += `
+                ${ex.type === 'strength' ? `
                     <div class="set-row">
-                        <label>Tid (min):</label>
-                        <input type="number" id="${ex.id}_time" placeholder="0" oninput="updateProgress()">
+                        <input type="number" id="${ex.id}_s1_kg" placeholder="KG"> x <input type="number" id="${ex.id}_s1_reps" placeholder="REPS">
+                        <div class="ghost-text" id="${ex.id}_ghost"></div>
                     </div>
-                `;
-            } else {
-                for (let i = 1; i <= ex.sets; i++) {
-                    html += `
-                        <div class="set-row">
-                            <label>Sæt ${i}:</label>
-                            <div class="input-group">
-                                <input type="number" id="${ex.id}_s${i}_kg" placeholder="0" oninput="updateProgress()"> <span>kg</span>
-                                <input type="number" id="${ex.id}_s${i}_reps" placeholder="0" oninput="updateProgress()"> <span>reps</span>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-            
-            html += `<textarea id="${ex.id}_note" rows="2" placeholder="Noter om form eller smerte..." oninput="updateProgress()"></textarea>`;
-            
-            html += `
-                <div class="check-container">
-                    <label for="${ex.id}_check">Færdig?</label>
-                    <input type="checkbox" id="${ex.id}_check" onchange="updateProgress()">
+                ` : `
+                    <input type="number" id="${ex.id}_time" placeholder="MIN"> min
+                    <div class="ghost-text" id="${ex.id}_ghost"></div>
+                `}
+                <textarea id="${ex.id}_note" placeholder="Noter..."></textarea>
+                <div style="text-align:right; margin-top:10px;">
+                    Færdig? <input type="checkbox" id="${ex.id}_check" onchange="updateProgress()">
                 </div>
             `;
-
-            card.innerHTML = html;
             container.appendChild(card);
         });
-
+        setupCalendar();
         loadData();
     }
 
     function updateProgress() {
-        const totalChecks = exercises.length;
-        let filledChecks = 0;
-        exercises.forEach(ex => {
-            if(document.getElementById(`${ex.id}_check`).checked) filledChecks++;
-        });
-
-        const percentage = totalChecks > 0 ? (filledChecks / totalChecks) * 100 : 0;
-        const progressBar = document.getElementById('progress-bar');
-        
-        progressBar.style.width = percentage + '%';
-        
-        if (percentage === 100) {
-            progressBar.style.backgroundColor = "#39ff14";
-            progressBar.style.boxShadow = "0 0 10px #39ff14";
-        } else {
-            progressBar.style.backgroundColor = "#00ffff";
-            progressBar.style.boxShadow = "0 0 10px #00ffff";
-        }
+        let done = document.getElementById('creatine_check').checked ? 1 : 0;
+        exercises.forEach(ex => { if(document.getElementById(`${ex.id}_check`).checked) done++; });
+        document.getElementById('progress-bar').style.width = (done / (exercises.length+1) * 100) + "%";
     }
 
     function saveData() {
-        let data = { 
-            date: new Date().toLocaleDateString('da-DK'),
-            timestamp: new Date().toISOString()
-        };
+        let activeDays = [];
+        document.querySelectorAll('.day-box.active').forEach(db => activeDays.push(db.id));
         
+        let data = {
+            date: new Date().toLocaleDateString('da-DK'),
+            creatine: document.getElementById('creatine_check').checked,
+            activeDays: activeDays,
+            exercises: {}
+        };
         exercises.forEach(ex => {
-            data[ex.id] = { 
+            data.exercises[ex.id] = {
+                checked: document.getElementById(`${ex.id}_check`).checked,
+                status: document.getElementById(`${ex.id}_status_val`).value,
                 note: document.getElementById(`${ex.id}_note`).value,
-                checked: document.getElementById(`${ex.id}_check`).checked
+                val1: document.getElementById(ex.type === 'cardio' ? `${ex.id}_time` : `${ex.id}_s1_kg`).value,
+                val2: ex.type === 'strength' ? document.getElementById(`${ex.id}_s1_reps`).value : ''
             };
-            
-            if (ex.type === 'cardio') {
-                data[ex.id].time = document.getElementById(`${ex.id}_time`).value;
-            } else {
-                let setsData = [];
-                for (let i = 1; i <= ex.sets; i++) {
-                    setsData.push({
-                        kg: document.getElementById(`${ex.id}_s${i}_kg`).value,
-                        reps: document.getElementById(`${ex.id}_s${i}_reps`).value
-                    });
-                }
-                data[ex.id].sets = setsData;
-            }
         });
-
-        localStorage.setItem('workoutData_V1_2', JSON.stringify(data));
-        showToast("DATA GEMT LOKALT!");
+        localStorage.setItem('workoutData_V1_4', JSON.stringify(data));
+        showToast("GEMT!");
     }
 
     function loadData() {
-        const saved = localStorage.getItem('workoutData_V1_2');
-        if (saved) {
-            const data = JSON.parse(saved);
-            exercises.forEach(ex => {
-                if (data[ex.id]) {
-                    document.getElementById(`${ex.id}_note`).value = data[ex.id].note || '';
-                    document.getElementById(`${ex.id}_check`).checked = data[ex.id].checked || false;
-                    
-                    if (ex.type === 'cardio' && data[ex.id].time) {
-                        document.getElementById(`${ex.id}_time`).value = data[ex.id].time;
-                    } else if (ex.type === 'strength' && data[ex.id].sets) {
-                        data[ex.id].sets.forEach((set, index) => {
-                            let i = index + 1;
-                            document.getElementById(`${ex.id}_s${i}_kg`).value = set.kg || '';
-                            document.getElementById(`${ex.id}_s${i}_reps`).value = set.reps || '';
-                        });
-                    }
-                }
-            });
-        }
+        const saved = localStorage.getItem('workoutData_V1_4');
+        if (!saved) return;
+        const data = JSON.parse(saved);
+        const isToday = data.date === new Date().toLocaleDateString('da-DK');
+
+        if(data.activeDays) data.activeDays.forEach(id => { if(document.getElementById(id)) document.getElementById(id).classList.add('active'); });
+        
+        if(isToday) document.getElementById('creatine_check').checked = data.creatine;
+
+        exercises.forEach(ex => {
+            const exData = data.exercises[ex.id];
+            if(!exData) return;
+            if(isToday) {
+                document.getElementById(`${ex.id}_check`).checked = exData.checked;
+                document.getElementById(`${ex.id}_note`).value = exData.note;
+                if(exData.status) setStatus(ex.id, exData.status);
+                document.getElementById(ex.type === 'cardio' ? `${ex.id}_time` : `${ex.id}_s1_kg`).value = exData.val1;
+                if(ex.type === 'strength') document.getElementById(`${ex.id}_s1_reps`).value = exData.val2;
+            } else {
+                const ghost = document.getElementById(`${ex.id}_ghost`);
+                ghost.innerText = ex.type === 'cardio' ? `Sidst: ${exData.val1} min` : `Sidst: ${exData.val1}kg x ${exData.val2}`;
+            }
+        });
         updateProgress();
     }
 
     function exportData() {
-        saveData(); 
-        let data = JSON.parse(localStorage.getItem('workoutData_V1_2'));
-        let exportText = `SYSTEM LOG - Fuldkrop (${data.date}):\n--------------------------\n\n`;
-        
-        exercises.forEach((ex, index) => {
-            let exData = data[ex.id];
-            exportText += `🏋️‍♂️ ${index + 1}. ${ex.name.toUpperCase()}\n`;
-            
-            if (ex.type === 'cardio') {
-                exportText += `   > Tid: ${exData.time ? exData.time + ' min' : 'Ej registreret'}\n`;
-            } else {
-                let setsExported = 0;
-                exData.sets.forEach((set, setIndex) => {
-                    if(set.kg || set.reps) {
-                        exportText += `   > Sæt ${setIndex + 1}: ${set.kg || 0} kg x ${set.reps || 0} reps\n`;
-                        setsExported++;
-                    }
-                });
-                if(setsExported === 0) exportText += `   > Ingen løft registreret.\n`;
-            }
-            if (exData.checked) exportText += `   > [FÆRDIG]\n`;
-            if (exData.note) {
-                exportText += `   > Noter: "${exData.note}"\n`;
-            }
-            exportText += `\n`;
+        saveData();
+        const data = JSON.parse(localStorage.getItem('workoutData_V1_4'));
+        let txt = `LOG ${data.date} (Uge ${getWeekNumber(new Date())})\n`;
+        txt += `Træningsdage denne uge: ${document.querySelectorAll('.day-box.active').length}\n`;
+        txt += `Kreatin: ${data.creatine ? 'JA' : 'NEJ'}\n\n`;
+        exercises.forEach(ex => {
+            const ed = data.exercises[ex.id];
+            txt += `${ex.name}: ${ed.val1}${ex.type==='strength' ? 'kg x '+ed.val2 : ' min'} [${ed.status || '?'}]\n`;
         });
-        
-        exportText += `--------------------------\n`;
-        exportText += `Energi / Noter til træner:\n[]`;
-
-        navigator.clipboard.writeText(exportText).then(() => {
-            showToast("DATA KLAR I UDKLIPSHOLDER!");
-        }).catch(err => {
-            alert('Kunne ikke kopiere. Prøv at trykke Gem og Send igen.');
-        });
+        navigator.clipboard.writeText(txt);
+        showToast("KOPIERET TIL UDKLIPSHOLDER!");
     }
 
-    function showToast(message) {
-        var x = document.getElementById("toast");
-        x.innerText = message;
-        x.className = "show";
-        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-    }
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 2000); }
 
-    async function fetchLatestVersion() {
-        const githubUsername = 'MichaelKHans'; 
-        const repoName = 'traenings-app'; 
-        const repoUrl = `https://api.github.com/repos/${githubUsername}/${repoName}/commits?per_page=1`;
-        
-        try {
-            const response = await fetch(repoUrl);
-            if (!response.ok) throw new Error('Repo not found');
-            const data = await response.json();
-            
-            if (data && data.length > 0) {
-                const commitDate = new Date(data[0].commit.author.date);
-                const formattedDate = commitDate.toLocaleDateString('da-DK', { day: 'numeric', month: 'short' }) + 
-                                      ' kl. ' + 
-                                      commitDate.toLocaleTimeString('da-DK', { hour: '2-digit', minute:'2-digit' });
-                document.getElementById('version-info').innerText = 'System V1.2 | Opdateret ' + formattedDate;
-            }
-        } catch (error) {
-            document.getElementById('version-info').innerText = 'System V1.2 | Offline version';
-        }
-    }
-
-    window.onload = function() {
-        renderApp();
-        fetchLatestVersion(); 
-    };
-
+    window.onload = renderApp;
 </script>
 </body>
 </html>
