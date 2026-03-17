@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - V2.3</title>
+    <title>Fitness Master 3000 - V2.4</title>
     
     <style>
         :root {
@@ -27,13 +27,14 @@
             color: var(--text-color);
             margin: 0;
             padding: 20px;
-            padding-bottom: 260px; 
+            padding-bottom: 280px; 
             box-sizing: border-box;
             font-weight: bold;
         }
 
         h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 15px; }
         
+        /* Kalender */
         .calendar-container { background-color: #000; border: 2px solid var(--neon-purple); padding: 10px; margin-bottom: 20px; border-radius: 4px; box-shadow: 4px 4px 0px var(--neon-purple); }
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; color: var(--neon-purple); margin-bottom: 10px; text-transform: uppercase; font-size: 0.9em; }
         .nav-btn { background: #111; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 5px 15px; cursor: pointer; font-family: inherit; }
@@ -54,27 +55,14 @@
         .timer-btn { background-color: #000; color: var(--neon-orange); border: 2px solid var(--neon-orange); padding: 10px; width: 100%; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .timer-bar-fill { width: 0%; height: 100%; background-color: var(--neon-orange); transition: width 1s linear; }
 
-        /* Øvelseskort med Farve-ID */
+        /* Øvelseskort */
         .exercise-card { background-color: var(--card-bg); padding: 15px; margin-bottom: 25px; border-left: 8px solid var(--muted-text); box-shadow: var(--retro-shadow); position: relative; }
-        
-        /* Farver for hver øvelse */
-        .card-0 { border-left-color: var(--neon-cyan) !important; }
-        .card-0 .exercise-name { color: var(--neon-cyan) !important; text-shadow: 0 0 5px var(--neon-cyan); }
-
-        .card-1 { border-left-color: var(--neon-green) !important; }
-        .card-1 .exercise-name { color: var(--neon-green) !important; text-shadow: 0 0 5px var(--neon-green); }
-
-        .card-2 { border-left-color: var(--neon-purple) !important; }
-        .card-2 .exercise-name { color: var(--neon-purple) !important; text-shadow: 0 0 5px var(--neon-purple); }
-
-        .card-3 { border-left-color: var(--neon-orange) !important; }
-        .card-3 .exercise-name { color: var(--neon-orange) !important; text-shadow: 0 0 5px var(--neon-orange); }
-
-        .card-4 { border-left-color: var(--neon-yellow) !important; }
-        .card-4 .exercise-name { color: var(--neon-yellow) !important; text-shadow: 0 0 5px var(--neon-yellow); }
-
-        .card-5 { border-left-color: var(--neon-red) !important; }
-        .card-5 .exercise-name { color: var(--neon-red) !important; text-shadow: 0 0 5px var(--neon-red); }
+        .card-0 { border-left-color: var(--neon-cyan) !important; } .card-0 .exercise-name { color: var(--neon-cyan) !important; }
+        .card-1 { border-left-color: var(--neon-green) !important; } .card-1 .exercise-name { color: var(--neon-green) !important; }
+        .card-2 { border-left-color: var(--neon-purple) !important; } .card-2 .exercise-name { color: var(--neon-purple) !important; }
+        .card-3 { border-left-color: var(--neon-orange) !important; } .card-3 .exercise-name { color: var(--neon-orange) !important; }
+        .card-4 { border-left-color: var(--neon-yellow) !important; } .card-4 .exercise-name { color: var(--neon-yellow) !important; }
+        .card-5 { border-left-color: var(--neon-red) !important; } .card-5 .exercise-name { color: var(--neon-red) !important; }
 
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .info-btn { background: #000; color: var(--text-color); border: 1px solid #444; padding: 4px 8px; font-size: 0.7em; cursor: pointer; font-family: inherit; }
@@ -90,10 +78,14 @@
         .set-row { margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px; }
         .set-inputs { display: flex; align-items: center; justify-content: space-between; }
         
-        input[type="number"], input[type="password"] { width: 65px; padding: 8px; background-color: #000; border: 2px solid var(--muted-text); color: var(--neon-yellow); text-align: center; font-family: inherit; font-size: 16px; }
+        input[type="number"], input[type="text"] { 
+            width: 65px; padding: 10px; background-color: #000; border: 2px solid var(--muted-text); color: var(--neon-yellow); text-align: center; font-family: inherit; font-size: 16px; 
+        }
+        #api_key_input { width: 100%; box-sizing: border-box; text-align: left; font-size: 12px; margin-bottom: 10px; border-color: var(--neon-cyan); }
+        
         textarea { width: 100%; padding: 10px; background-color: #000; border: 1px solid var(--muted-text); color: #fff; margin-top: 5px; font-family: inherit; box-sizing: border-box; }
 
-        /* AI LOG & CHAT LAYOUT */
+        /* AI LOG SEKTION */
         .ai-log-section { background-color: #000; border: 2px solid var(--neon-cyan); padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--neon-cyan); }
         #ai-response-box { 
             display: none; background-color: #111; border: 1px solid var(--neon-green); padding: 12px; 
@@ -108,7 +100,7 @@
         .btn-export { background: var(--neon-purple); color: #fff; border: none; }
         
         #version-info { text-align: center; font-size: 0.7em; color: #555; margin-top: 10px; cursor: pointer; }
-        #toast { visibility: hidden; position: fixed; left: 50%; bottom: 180px; transform: translateX(-50%); background: var(--neon-cyan); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; }
+        #toast { visibility: hidden; position: fixed; left: 50%; bottom: 200px; transform: translateX(-50%); background: var(--neon-cyan); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; }
         #toast.show { visibility: visible; }
     </style>
 </head>
@@ -148,11 +140,15 @@
             <button class="action-btn btn-ai" onclick="askGemini()">[Spørg Gemini]</button>
             <button class="action-btn btn-export" onclick="exportData()">[Kopier Log]</button>
         </div>
-        <div id="version-info" onclick="toggleSettings()">V2.3 | Indstillinger ⚙️</div>
+        <div id="version-info" onclick="toggleSettings()">V2.4 | Indstillinger ⚙️</div>
         
-        <div id="settings-area" style="display:none; padding-top:10px;">
-            <input type="password" id="api_key_input" placeholder="Indsæt Gemini API nøgle her...">
-            <button class="action-btn btn-save" style="padding:5px; margin-top:5px; width:100%;" onclick="saveKey()">Gem Nøgle</button>
+        <div id="settings-area" style="display:none; padding-top:15px; border-top: 1px dashed #444; margin-top: 10px;">
+            <div style="color: var(--neon-cyan); font-size: 0.7em; margin-bottom: 5px;">GEMINI API NØGLE (SYNLIG):</div>
+            <input type="text" id="api_key_input" placeholder="Indsæt nøgle her...">
+            <div style="display: flex; gap: 5px;">
+                <button class="action-btn btn-save" style="padding:10px; flex: 2;" onclick="saveKey()">Gem Nøgle</button>
+                <button class="action-btn" style="padding:10px; flex: 1; background: #222; color: var(--neon-red); border: 1px solid var(--neon-red);" onclick="deleteKey()">Slet</button>
+            </div>
         </div>
     </div>
 
@@ -169,6 +165,33 @@
     ];
 
     let currentWeekOffset = 0;
+
+    // --- NYE INDSTILLINGS FUNKTIONER ---
+    function toggleSettings() {
+        const s = document.getElementById('settings-area');
+        const input = document.getElementById('api_key_input');
+        if (s.style.display === 'none') {
+            s.style.display = 'block';
+            input.value = localStorage.getItem('gemini_api_key_V2') || "";
+        } else {
+            s.style.display = 'none';
+        }
+    }
+
+    function saveKey() {
+        const key = document.getElementById('api_key_input').value.trim();
+        localStorage.setItem('gemini_api_key_V2', key);
+        showToast("Nøgle Gemt!");
+        toggleSettings();
+    }
+
+    function deleteKey() {
+        if(confirm("Vil du slette den gemte nøgle?")) {
+            localStorage.removeItem('gemini_api_key_V2');
+            document.getElementById('api_key_input').value = "";
+            showToast("Nøgle Slettet!");
+        }
+    }
 
     // --- KALENDER & VÆGT ---
     function toggleDay(id) {
@@ -213,10 +236,10 @@
         }
     }
 
-    // --- AI LOGIK (OPDATERET TIL v1) ---
+    // --- AI LOGIK ---
     async function askGemini() {
-        const key = (localStorage.getItem('gemini_api_key') || "").trim();
-        if (!key || key.length < 10) { alert("Tjek API-nøgle i indstillinger."); toggleSettings(); return; }
+        const key = (localStorage.getItem('gemini_api_key_V2') || "").trim();
+        if (!key || key.length < 10) { alert("Indsæt API-nøgle i indstillinger."); toggleSettings(); return; }
         const userMsg = document.getElementById('ai_log_input').value;
         if (!userMsg) return;
 
@@ -226,8 +249,7 @@
         responseBox.style.color = "var(--neon-green)";
 
         try {
-            // Skifter til v1 som er den mest stabile lige nu
-            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
             const response = await fetch(url, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: "Du er træner for Michael. Svar kort på: " + userMsg }] }] })
@@ -239,12 +261,10 @@
             } else {
                 responseBox.innerText = result.candidates[0].content.parts[0].text;
             }
-        } catch (e) { responseBox.innerText = "Netværksfejl."; }
+        } catch (e) { responseBox.innerText = "Netværksfejl. Tjek internet."; }
     }
 
     // --- STANDARD FUNKTIONER ---
-    function saveKey() { localStorage.setItem('gemini_api_key', document.getElementById('api_key_input').value); showToast("Nøgle Gemt!"); toggleSettings(); }
-    function toggleSettings() { const s = document.getElementById('settings-area'); s.style.display = s.style.display === 'none' ? 'block' : 'none'; }
     function getWeekNumber(d) { d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7)); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil(((d - yearStart) / 86400000 + 1)/7); }
     function changeWeek(offset) { currentWeekOffset += offset; setupCalendar(); }
     
@@ -290,7 +310,6 @@
                 for (let i = 1; i <= 3; i++) {
                     content += `<div class="set-row">
                         <div class="set-inputs"><span>Sæt ${i}</span><div><input type="number" id="${ex.id}_s${i}_kg" placeholder="KG"> x <input type="number" id="${ex.id}_s${i}_reps" placeholder="REPS"></div></div>
-                        <div style="font-size:0.7em; color:var(--neon-yellow); margin-top:2px;">>> 10-12 reps | 90s Pause</div>
                     </div>`;
                 }
             } else { content += `<div class="set-row"><div class="set-inputs"><span>Tid</span><input type="number" id="${ex.id}_time" placeholder="MIN"></div></div>`; }
@@ -335,7 +354,6 @@
     }
 
     function exportData() { saveData(); showToast("KOPIERET"); }
-
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 2000); }
 
     window.onload = () => { renderApp(); };
