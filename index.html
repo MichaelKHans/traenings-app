@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - V1.9.1</title>
+    <title>Fitness Master 3000 - V2.1 AI Chat</title>
     
     <style>
         :root {
@@ -32,22 +32,10 @@
             font-weight: bold;
         }
 
-        h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 10px; }
+        h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 15px; }
         
         .coach-focus-box { background-color: rgba(255, 140, 0, 0.1); border: 2px solid var(--neon-orange); padding: 15px; margin-bottom: 20px; border-radius: 4px; }
         
-        #ai-response-box { 
-            display: none; 
-            background-color: #000; 
-            border: 2px solid var(--neon-green); 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            color: var(--neon-green); 
-            font-size: 0.9em; 
-            line-height: 1.4; 
-            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); 
-        }
-
         .calendar-container { background-color: #000; border: 2px solid var(--neon-purple); padding: 10px; margin-bottom: 20px; border-radius: 4px; box-shadow: 4px 4px 0px var(--neon-purple); }
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; color: var(--neon-purple); margin-bottom: 10px; text-transform: uppercase; font-size: 0.9em; }
         .nav-btn { background: #111; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 5px 15px; cursor: pointer; font-family: inherit; }
@@ -68,7 +56,15 @@
         .timer-btn { background-color: #000; color: var(--neon-orange); border: 2px solid var(--neon-orange); padding: 10px; width: 100%; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .timer-bar-fill { width: 0%; height: 100%; background-color: var(--neon-orange); transition: width 1s linear; }
 
+        /* Øvelseskort med sidefarver */
         .exercise-card { background-color: var(--card-bg); padding: 15px; margin-bottom: 25px; border-left: 6px solid var(--muted-text); box-shadow: var(--retro-shadow); position: relative; }
+        .card-0 { border-left-color: var(--neon-cyan); }
+        .card-1 { border-left-color: var(--neon-green); }
+        .card-2 { border-left-color: var(--neon-purple); }
+        .card-3 { border-left-color: var(--neon-orange); }
+        .card-4 { border-left-color: var(--neon-yellow); }
+        .card-5 { border-left-color: var(--neon-red); }
+
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .info-btn { background: #000; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 4px 8px; font-size: 0.7em; cursor: pointer; font-family: inherit; }
         .info-box { display: none; background-color: #000; border: 1px solid var(--neon-cyan); padding: 12px; margin: 10px 0; font-size: 0.85em; color: var(--text-color); line-height: 1.4; }
@@ -82,13 +78,17 @@
 
         .set-row { margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px; }
         .set-inputs { display: flex; align-items: center; justify-content: space-between; }
-        .pause-reminder { font-size: 0.7em; color: var(--neon-yellow); margin-top: 2px; text-transform: uppercase; }
         
         input[type="number"], input[type="password"] { width: 65px; padding: 8px; background-color: #000; border: 2px solid var(--muted-text); color: var(--neon-yellow); text-align: center; font-family: inherit; font-size: 16px; }
-        input[type="password"] { width: 100%; margin-top: 10px; }
         textarea { width: 100%; padding: 10px; background-color: #000; border: 1px solid var(--muted-text); color: #fff; margin-top: 5px; font-family: inherit; box-sizing: border-box; }
 
+        /* AI LOG SEKTION & SVAR BOX */
         .ai-log-section { background-color: #000; border: 2px solid var(--neon-cyan); padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--neon-cyan); }
+        #ai-response-box { 
+            display: none; background-color: #111; border: 1px solid var(--neon-green); padding: 12px; 
+            margin-top: 15px; color: var(--neon-green); font-size: 0.85em; line-height: 1.4; 
+        }
+
         .bottom-fixed-container { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); padding: 15px; border-top: 2px solid #333; z-index: 1000; }
         .btn-container { display: flex; gap: 10px; flex-wrap: wrap; }
         button.action-btn { flex: 1; min-width: 120px; padding: 15px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-family: inherit; border-radius: 4px; }
@@ -107,11 +107,9 @@
 
     <div class="coach-focus-box">
         <div id="global-coach-advice" style="font-size: 0.85em; line-height: 1.4;">
-            Klik på en dag for at logge vægt. Spørg Gemini hvis du er i tvivl om øvelserne.
+            Fokus: Kontrollerede træk og 90 sek pause. Spørg Gemini herunder ved spørgsmål.
         </div>
     </div>
-
-    <div id="ai-response-box"></div>
     
     <div class="calendar-container">
         <div class="calendar-nav">
@@ -135,7 +133,8 @@
 
     <div class="ai-log-section">
         <div style="color:var(--neon-cyan); font-size:0.8em; text-transform:uppercase; margin-bottom:8px;">🤖 SPØRG GEMINI (Live Sparring)</div>
-        <textarea id="ai_log_input" placeholder="Fx: 'Mine ben er ømme, skal jeg øge vægten?'"></textarea>
+        <textarea id="ai_log_input" placeholder="Fx: 'Hvordan skåner jeg bedst halebenet i dag?'"></textarea>
+        <div id="ai-response-box"></div>
     </div>
 
     <div class="bottom-fixed-container">
@@ -144,7 +143,7 @@
             <button class="action-btn btn-ai" onclick="askGemini()">[Spørg Gemini]</button>
             <button class="action-btn btn-export" onclick="exportData()">[Kopier Log]</button>
         </div>
-        <div id="version-info" onclick="toggleSettings()">V1.9.1 | Indstillinger ⚙️</div>
+        <div id="version-info" onclick="toggleSettings()">V2.1 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:10px;">
             <input type="password" id="api_key_input" placeholder="Indsæt Gemini API nøgle her...">
@@ -156,12 +155,12 @@
 
 <script>
     const exercises = [
-        { id: 'cardio', name: 'Løbebånd (Varme)', type: 'cardio', info: '1 min løb / 2 min gang (gentag 3-4 gange). Ved smerte i haleben: Skru op for incline og gå.' },
-        { id: 'benpres', name: 'Siddende Benpres', type: 'strength', sets: 3, info: 'Pres lænden helt tilbage. Mål: 10-12 reps. De sidste 2 skal være hårde.' },
-        { id: 'brystpres', name: 'Siddende Brystpres', type: 'strength', sets: 3, info: 'Kontrolleret fremad. Ryggen mod lænet. Mål: 10-12 reps.' },
-        { id: 'rygtraek', name: 'Rygtræk m. bryststøtte', type: 'strength', sets: 3, info: 'Støt bryst mod plade. Træk skuldre tilbage. Mål: 10-12 reps.' },
-        { id: 'traekned', name: 'Træk til bryst (Lat)', type: 'strength', sets: 3, info: 'Træk til toppen af brystet. Læn dig kun lidt tilbage. Mål: 10-12 reps.' },
-        { id: 'benstraek', name: 'Benstræk (Leg Ext)', type: 'strength', sets: 3, info: 'Isolerer forlåret. Meget sikker øvelse. Mål: 10-12 reps.' }
+        { id: 'cardio', name: 'Løbebånd (Varme)', type: 'cardio', info: '1 min løb / 2 min gang (x 3-4).' },
+        { id: 'benpres', name: 'Siddende Benpres', type: 'strength', sets: 3, info: 'Pres lænden helt tilbage. Mål: 10-12 reps.' },
+        { id: 'brystpres', name: 'Siddende Brystpres', type: 'strength', sets: 3, info: 'Kontrolleret. Ryggen mod lænet. Mål: 10-12 reps.' },
+        { id: 'rygtraek', name: 'Rygtræk m. bryststøtte', type: 'strength', sets: 3, info: 'Mål: 10-12 reps. Aflaster lænden.' },
+        { id: 'traekned', name: 'Træk til bryst (Lat)', type: 'strength', sets: 3, info: 'Sid fast. Træk til brystet. Mål: 10-12 reps.' },
+        { id: 'benstraek', name: 'Benstræk (Leg Ext)', type: 'strength', sets: 3, info: 'Isolerer forlåret. Mål: 10-12 reps.' }
     ];
 
     let currentWeekOffset = 0;
@@ -169,8 +168,7 @@
     // --- KALENDER & VÆGT ---
     function toggleDay(id) {
         const el = document.getElementById(id);
-        const weights = JSON.parse(localStorage.getItem('weight_logs_V1') || "{}");
-
+        const weights = JSON.parse(localStorage.getItem('weight_logs_V2') || "{}");
         if (!el.classList.contains('active')) {
             const weight = prompt("Hvad er din vægt i dag? (Valgfrit)");
             if (weight) weights[id] = weight;
@@ -179,7 +177,7 @@
             el.classList.remove('active');
             delete weights[id];
         }
-        localStorage.setItem('weight_logs_V1', JSON.stringify(weights));
+        localStorage.setItem('weight_logs_V2', JSON.stringify(weights));
         setupCalendar();
         saveData();
     }
@@ -192,8 +190,8 @@
         const dayNames = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
         const monday = new Date(now);
         monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
-        const activeDays = JSON.parse(localStorage.getItem('calendar_V1_9') || "[]");
-        const weights = JSON.parse(localStorage.getItem('weight_logs_V1') || "{}");
+        const activeDays = JSON.parse(localStorage.getItem('calendar_V2') || "[]");
+        const weights = JSON.parse(localStorage.getItem('weight_logs_V2') || "{}");
         grid.innerHTML = '';
         for(let i=0; i<7; i++) {
             const d = new Date(monday);
@@ -210,7 +208,7 @@
         }
     }
 
-    // --- AI LOGIK (V1.9.1 FIX) ---
+    // --- AI LOGIK ---
     async function askGemini() {
         const key = (localStorage.getItem('gemini_api_key') || "").trim();
         if (!key || key.length < 10) { alert("Indsæt API-nøgle i indstillinger."); toggleSettings(); return; }
@@ -219,33 +217,26 @@
 
         const responseBox = document.getElementById('ai-response-box');
         responseBox.style.display = 'block';
-        responseBox.innerText = "Forbinder til Gemini... 🤖";
-        responseBox.style.borderColor = "var(--neon-green)";
+        responseBox.innerText = "Tænker... 🤖";
         responseBox.style.color = "var(--neon-green)";
 
-        const data = JSON.parse(localStorage.getItem('workoutData_V1_9') || "{}");
-        let context = `Dette er MichaelKHans (bygningskonstruktør, haleben-skade). Dagens træningsstatus: `;
-        exercises.forEach(ex => {
-            const ed = data.exercises ? data.exercises[ex.id] : null;
-            if(ed) context += `${ex.name}: ${ed.sets ? ed.sets[0].kg+'kg' : ed.time+'min'}. `;
-        });
-        context += ` Michaels spørgsmål: ${userMsg}`;
+        const data = JSON.parse(localStorage.getItem('workoutData_V2') || "{}");
+        let context = `MichaelKHans (bygningskonstruktør, haleben-skade). Michaels spørgsmål: ${userMsg}`;
 
         try {
-            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
             const response = await fetch(url, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
             });
             const result = await response.json();
             if (result.error) {
-                responseBox.innerText = "FEJL FRA GOOGLE: " + result.error.message;
-                responseBox.style.borderColor = "var(--neon-red)";
+                responseBox.innerText = "FEJL: " + result.error.message;
                 responseBox.style.color = "var(--neon-red)";
             } else {
                 responseBox.innerText = result.candidates[0].content.parts[0].text;
             }
-        } catch (e) { responseBox.innerText = "Systemfejl. Tjek din internetforbindelse."; }
+        } catch (e) { responseBox.innerText = "Netværksfejl."; }
     }
 
     // --- STANDARD FUNKTIONER ---
@@ -278,7 +269,7 @@
         const container = document.getElementById('workout-container');
         exercises.forEach((ex, index) => {
             const card = document.createElement('div');
-            card.className = `exercise-card`;
+            card.className = `exercise-card card-${index % 6}`;
             let content = `
                 <div class="card-header">
                     <div style="color:var(--neon-cyan);">${index+1}. ${ex.name}</div>
@@ -296,11 +287,10 @@
                 for (let i = 1; i <= 3; i++) {
                     content += `<div class="set-row">
                         <div class="set-inputs"><span>Sæt ${i}</span><div><input type="number" id="${ex.id}_s${i}_kg" placeholder="KG"> x <input type="number" id="${ex.id}_s${i}_reps" placeholder="REPS"></div></div>
-                        <div class="ghost-text" id="${ex.id}_s${i}_ghost"></div>
-                        <div class="pause-reminder">>> Mål: 10-12 reps | 90s Pause</div>
+                        <div style="font-size:0.7em; color:var(--neon-yellow); margin-top:2px;">>> 10-12 reps | 90s Pause</div>
                     </div>`;
                 }
-            } else { content += `<div class="set-row"><div class="set-inputs"><span>Tid</span><input type="number" id="${ex.id}_time" placeholder="MIN"></div><div class="ghost-text" id="${ex.id}_ghost"></div></div>`; }
+            } else { content += `<div class="set-row"><div class="set-inputs"><span>Tid</span><input type="number" id="${ex.id}_time" placeholder="MIN"></div></div>`; }
             content += `<textarea id="${ex.id}_note" placeholder="Noter..."></textarea><div style="text-align:right; margin-top:10px;">Færdig? <input type="checkbox" id="${ex.id}_check" onchange="updateProgress()"></div>`;
             card.innerHTML = content;
             container.appendChild(card);
@@ -317,30 +307,21 @@
     function saveData() {
         let activeDays = [];
         document.querySelectorAll('.day-box.active').forEach(db => activeDays.push(db.id));
-        localStorage.setItem('calendar_V1_9', JSON.stringify(activeDays));
+        localStorage.setItem('calendar_V2', JSON.stringify(activeDays));
         let data = { date: new Date().toLocaleDateString('da-DK'), ai_log: document.getElementById('ai_log_input').value, exercises: {} };
         exercises.forEach(ex => {
             let exData = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value, note: document.getElementById(`${ex.id}_note`).value };
             if(ex.type === 'strength') {
-                exData.sets = [
-                    {kg: document.getElementById(`${ex.id}_s1_kg`).value, reps: document.getElementById(`${ex.id}_s1_reps`).value},
-                    {kg: document.getElementById(`${ex.id}_s2_kg`).value, reps: document.getElementById(`${ex.id}_s2_reps`).value},
-                    {kg: document.getElementById(`${ex.id}_s3_kg`).value, reps: document.getElementById(`${ex.id}_s3_reps`).value}
-                ];
+                exData.sets = [{kg: document.getElementById(`${ex.id}_s1_kg`).value, reps: document.getElementById(`${ex.id}_s1_reps`).value}, {kg: document.getElementById(`${ex.id}_s2_kg`).value, reps: document.getElementById(`${ex.id}_s2_reps`).value}, {kg: document.getElementById(`${ex.id}_s3_kg`).value, reps: document.getElementById(`${ex.id}_s3_reps`).value}];
             } else { exData.time = document.getElementById(`${ex.id}_time`).value; }
             data.exercises[ex.id] = exData;
         });
-        localStorage.setItem('workoutData_V1_9', JSON.stringify(data));
+        localStorage.setItem('workoutData_V2', JSON.stringify(data));
         showToast("DATA GEMT");
     }
 
-    function loadCalendarState() {
-        let activeDays = JSON.parse(localStorage.getItem('calendar_V1_9') || "[]");
-        activeDays.forEach(id => { if(document.getElementById(id)) document.getElementById(id).classList.add('active'); });
-    }
-
     function loadData() {
-        const saved = localStorage.getItem('workoutData_V1_9');
+        const saved = localStorage.getItem('workoutData_V2');
         if (!saved) return;
         const data = JSON.parse(saved);
         const isToday = data.date === new Date().toLocaleDateString('da-DK');
@@ -353,17 +334,8 @@
                 document.getElementById(`${ex.id}_note`).value = ed.note;
                 if(ed.status) setStatus(ex.id, ed.status);
                 if(ex.type === 'strength') {
-                    ed.sets.forEach((s, i) => { 
-                        if(document.getElementById(`${ex.id}_s${i+1}_kg`)) {
-                            document.getElementById(`${ex.id}_s${i+1}_kg`).value = s.kg; 
-                            document.getElementById(`${ex.id}_s${i+1}_reps`).value = s.reps; 
-                        }
-                    });
+                    ed.sets.forEach((s, i) => { if(document.getElementById(`${ex.id}_s${i+1}_kg`)) { document.getElementById(`${ex.id}_s${i+1}_kg`).value = s.kg; document.getElementById(`${ex.id}_s${i+1}_reps`).value = s.reps; } });
                 } else { if(document.getElementById(`${ex.id}_time`)) document.getElementById(`${ex.id}_time`).value = ed.time; }
-            } else {
-                if(ex.type === 'strength') {
-                    ed.sets.forEach((s, i) => { if(s.kg && document.getElementById(`${ex.id}_s${i+1}_ghost`)) document.getElementById(`${ex.id}_s${i+1}_ghost`).innerText = `Sidst: ${s.kg}kg x ${s.reps}`; });
-                } else { if(document.getElementById(`${ex.id}_ghost`)) document.getElementById(`${ex.id}_ghost`).innerText = `Sidst: ${ed.time} min`; }
             }
         });
         updateProgress();
@@ -371,18 +343,15 @@
 
     function exportData() {
         saveData();
-        const data = JSON.parse(localStorage.getItem('workoutData_V1_9'));
-        const weights = JSON.parse(localStorage.getItem('weight_logs_V1') || "{}");
+        const data = JSON.parse(localStorage.getItem('workoutData_V2'));
+        const weights = JSON.parse(localStorage.getItem('weight_logs_V2') || "{}");
         let txt = `LOG ${data.date} | Vægt: ${weights['day_'+new Date().toISOString().split('T')[0]] || 'Ej angivet'}\n-------------------\n`;
         exercises.forEach(ex => {
             const ed = data.exercises[ex.id];
-            txt += `${ex.name}: `;
-            if(ex.type === 'strength') { ed.sets.forEach((s, i) => { if(s.kg) txt += `S${i+1}: ${s.kg}x${s.reps} `; }); }
-            else { txt += `${ed.time} min`; }
-            txt += ` [Status: ${ed.status || '?'}]\n`;
+            txt += `${ex.name}: [Status: ${ed.status || '?'}]\n`;
         });
         navigator.clipboard.writeText(txt);
-        showToast("KOPIERET TIL UDKLIPSHOLDER");
+        showToast("KOPIERET");
     }
 
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 2000); }
