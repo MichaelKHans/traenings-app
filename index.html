@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 3000 - V2.6</title>
+    <title>Fitness Master 3000 - V2.7 AI Auto-Fix</title>
     
     <style>
         :root {
@@ -34,7 +34,6 @@
 
         h1 { text-align: center; color: var(--neon-green); text-transform: uppercase; text-shadow: 0 0 5px var(--neon-green); font-size: 1.5em; margin-bottom: 15px; }
         
-        /* Kalender */
         .calendar-container { background-color: #000; border: 2px solid var(--neon-purple); padding: 10px; margin-bottom: 20px; border-radius: 4px; box-shadow: 4px 4px 0px var(--neon-purple); }
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; color: var(--neon-purple); margin-bottom: 10px; text-transform: uppercase; font-size: 0.9em; }
         .nav-btn { background: #111; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 5px 15px; cursor: pointer; font-family: inherit; }
@@ -55,26 +54,14 @@
         .timer-btn { background-color: #000; color: var(--neon-orange); border: 2px solid var(--neon-orange); padding: 10px; width: 100%; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .timer-bar-fill { width: 0%; height: 100%; background-color: var(--neon-orange); transition: width 1s linear; }
 
-        /* Øvelseskort med SUPER-tydelige farver */
         .exercise-card { background-color: var(--card-bg); padding: 15px; margin-bottom: 25px; border-left: 10px solid var(--muted-text); box-shadow: var(--retro-shadow); position: relative; }
         
-        .card-0 { border-left-color: var(--neon-cyan) !important; }
-        .card-0 .exercise-name { color: var(--neon-cyan) !important; text-shadow: 0 0 5px var(--neon-cyan); }
-
-        .card-1 { border-left-color: var(--neon-green) !important; }
-        .card-1 .exercise-name { color: var(--neon-green) !important; text-shadow: 0 0 5px var(--neon-green); }
-
-        .card-2 { border-left-color: var(--neon-purple) !important; }
-        .card-2 .exercise-name { color: var(--neon-purple) !important; text-shadow: 0 0 5px var(--neon-purple); }
-
-        .card-3 { border-left-color: var(--neon-orange) !important; }
-        .card-3 .exercise-name { color: var(--neon-orange) !important; text-shadow: 0 0 5px var(--neon-orange); }
-
-        .card-4 { border-left-color: var(--neon-yellow) !important; }
-        .card-4 .exercise-name { color: var(--neon-yellow) !important; text-shadow: 0 0 5px var(--neon-yellow); }
-
-        .card-5 { border-left-color: var(--neon-red) !important; }
-        .card-5 .exercise-name { color: var(--neon-red) !important; text-shadow: 0 0 5px var(--neon-red); }
+        .card-0 { border-left-color: var(--neon-cyan) !important; } .card-0 .exercise-name { color: var(--neon-cyan) !important; text-shadow: 0 0 5px var(--neon-cyan); }
+        .card-1 { border-left-color: var(--neon-green) !important; } .card-1 .exercise-name { color: var(--neon-green) !important; text-shadow: 0 0 5px var(--neon-green); }
+        .card-2 { border-left-color: var(--neon-purple) !important; } .card-2 .exercise-name { color: var(--neon-purple) !important; text-shadow: 0 0 5px var(--neon-purple); }
+        .card-3 { border-left-color: var(--neon-orange) !important; } .card-3 .exercise-name { color: var(--neon-orange) !important; text-shadow: 0 0 5px var(--neon-orange); }
+        .card-4 { border-left-color: var(--neon-yellow) !important; } .card-4 .exercise-name { color: var(--neon-yellow) !important; text-shadow: 0 0 5px var(--neon-yellow); }
+        .card-5 { border-left-color: var(--neon-red) !important; } .card-5 .exercise-name { color: var(--neon-red) !important; text-shadow: 0 0 5px var(--neon-red); }
 
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .info-btn { background: #000; color: #fff; border: 1px solid #555; padding: 4px 8px; font-size: 0.7em; cursor: pointer; font-family: inherit; }
@@ -87,22 +74,12 @@
         .active-y { border-color: var(--neon-yellow) !important; color: var(--neon-yellow) !important; }
         .active-r { border-color: var(--neon-red) !important; color: var(--neon-red) !important; }
 
-        .set-row { margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px; }
-        .set-inputs { display: flex; align-items: center; justify-content: space-between; }
-        
-        input[type="number"], input[type="text"] { 
-            width: 65px; padding: 10px; background-color: #000; border: 2px solid var(--muted-text); color: var(--neon-yellow); text-align: center; font-family: inherit; font-size: 16px; 
-        }
+        input[type="number"], input[type="text"] { width: 65px; padding: 10px; background-color: #000; border: 2px solid var(--muted-text); color: var(--neon-yellow); text-align: center; font-family: inherit; font-size: 16px; }
         #api_key_input { width: 100%; box-sizing: border-box; text-align: left; font-size: 11px; margin-bottom: 10px; border-color: var(--neon-cyan); color: var(--neon-cyan); }
-        
         textarea { width: 100%; padding: 10px; background-color: #000; border: 1px solid var(--muted-text); color: #fff; margin-top: 5px; font-family: inherit; box-sizing: border-box; }
 
-        /* AI CHAT */
         .ai-log-section { background-color: #000; border: 2px solid var(--neon-cyan); padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--neon-cyan); }
-        #ai-response-box { 
-            display: none; background-color: #111; border: 1px solid var(--neon-green); padding: 12px; 
-            margin-top: 15px; color: var(--neon-green); font-size: 0.85em; line-height: 1.5; 
-        }
+        #ai-response-box { display: none; background-color: #111; border: 1px solid var(--neon-green); padding: 12px; margin-top: 15px; color: var(--neon-green); font-size: 0.85em; line-height: 1.5; }
 
         .bottom-fixed-container { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); padding: 15px; border-top: 2px solid #333; z-index: 1000; }
         .btn-container { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -110,7 +87,6 @@
         .btn-save { background: #000; color: var(--neon-green); border: 2px solid var(--neon-green); }
         .btn-ai { background: var(--neon-cyan); color: #000; border: none; }
         .btn-export { background: var(--neon-purple); color: #fff; border: none; }
-        
         #version-info { text-align: center; font-size: 0.7em; color: #555; margin-top: 10px; cursor: pointer; }
         #toast { visibility: hidden; position: fixed; left: 50%; bottom: 200px; transform: translateX(-50%); background: var(--neon-cyan); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; }
         #toast.show { visibility: visible; }
@@ -142,7 +118,7 @@
 
     <div class="ai-log-section">
         <div style="color:var(--neon-cyan); font-size:0.8em; text-transform:uppercase; margin-bottom:8px;">🤖 SPØRG GEMINI (Live Sparring)</div>
-        <textarea id="ai_log_input" placeholder="Fx: 'Mine ben er ømme, skal jeg tage 3 sæt?'"></textarea>
+        <textarea id="ai_log_input" placeholder="Fx: 'Vægten føltes let i dag, skal jeg øge?'"></textarea>
         <div id="ai-response-box"></div>
     </div>
 
@@ -152,11 +128,10 @@
             <button class="action-btn btn-ai" onclick="askGemini()">[Spørg Gemini]</button>
             <button class="action-btn btn-export" onclick="exportData()">[Log]</button>
         </div>
-        <div id="version-info" onclick="toggleSettings()">V2.6 | Indstillinger ⚙️</div>
+        <div id="version-info" onclick="toggleSettings()">V2.7 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:15px; border-top: 1px dashed #444; margin-top: 10px;">
-            <div style="color: var(--neon-cyan); font-size: 0.7em; margin-bottom: 5px;">DIN API NØGLE (STABIL v1):</div>
-            <input type="text" id="api_key_input" placeholder="Indsæt din nøgle her...">
+            <input type="text" id="api_key_input" placeholder="Indsæt din AI nøgle her...">
             <div style="display: flex; gap: 5px;">
                 <button class="action-btn btn-save" style="padding:10px; flex: 2;" onclick="saveKey()">Gem Nøgle</button>
                 <button class="action-btn" style="padding:10px; flex: 1; background: #222; color: var(--neon-red); border: 1px solid var(--neon-red);" onclick="deleteKey()">Slet</button>
@@ -178,7 +153,53 @@
 
     let currentWeekOffset = 0;
 
-    // --- KALENDER & VÆGT ---
+    // --- AI LOGIK (V2.7 AUTO-RECOVERY) ---
+    async function askGemini() {
+        const key = (localStorage.getItem('gemini_api_key_V2') || "").trim();
+        if (!key || key.length < 10) { alert("Indsæt nøgle i indstillinger."); toggleSettings(); return; }
+        const userMsg = document.getElementById('ai_log_input').value;
+        if (!userMsg) return;
+
+        const responseBox = document.getElementById('ai-response-box');
+        responseBox.style.display = 'block';
+        responseBox.innerText = "Forbinder til AI hjerne... 🤖";
+        responseBox.style.color = "var(--neon-green)";
+
+        // Liste over modeller vi prøver i rækkefølge
+        const modelsToTry = [
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-latest",
+            "gemini-pro"
+        ];
+
+        const promptText = `Du er en personlig træner for Michael. Svar kort og motiverende på dansk. Michaels spørgsmål: ${userMsg}`;
+
+        for (const modelName of modelsToTry) {
+            try {
+                // Vi prøver både v1 og v1beta automatisk
+                const versions = ["v1beta", "v1"];
+                for (const ver of versions) {
+                    const url = `https://generativelanguage.googleapis.com/${ver}/models/${modelName}:generateContent?key=${key}`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+                    });
+                    
+                    const result = await response.json();
+                    if (!result.error) {
+                        responseBox.innerText = result.candidates[0].content.parts[0].text;
+                        return; // Succes! Vi stopper her.
+                    }
+                }
+            } catch (e) { console.log("Prøver næste model..."); }
+        }
+        
+        responseBox.innerText = "FEJL: Ingen modeller svarede. Tjek om din API nøgle er aktiv i Google AI Studio, eller opret en HELT NY nøgle i et 'New Project'.";
+        responseBox.style.color = "var(--neon-red)";
+    }
+
+    // --- KALENDER & SYSTEM ---
     function toggleDay(id) {
         const el = document.getElementById(id);
         const weights = JSON.parse(localStorage.getItem('weight_logs_V3') || "{}");
@@ -221,101 +242,28 @@
         }
     }
 
-    // --- AI LOGIK (V2.6 FIX TIL STABLE v1) ---
-    async function askGemini() {
-        const key = (localStorage.getItem('gemini_api_key_V2') || "").trim();
-        if (!key || key.length < 10) { alert("Indsæt nøgle i indstillinger."); toggleSettings(); return; }
-        const userMsg = document.getElementById('ai_log_input').value;
-        if (!userMsg) return;
-
-        const responseBox = document.getElementById('ai-response-box');
-        responseBox.style.display = 'block';
-        responseBox.innerText = "Forbinder til Gemini (Stable v1)... 🤖";
-        responseBox.style.color = "var(--neon-green)";
-
-        // Skifter til den stabile v1 port som Gemini 1.5 Flash nu kræver
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
-
-        const promptText = `Du er en trænings-coach for Michael (bygningskonstruktør). Svar kort og præcist på dansk. Michaels spørgsmål: ${userMsg}`;
-
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
-            });
-            const result = await response.json();
-            if (result.error) {
-                responseBox.innerText = "GOOGLE SIGER: " + result.error.message;
-                responseBox.style.color = "var(--neon-red)";
-            } else {
-                responseBox.innerText = result.candidates[0].content.parts[0].text;
-            }
-        } catch (e) { responseBox.innerText = "Forbindelsesfejl. Tjek dit internet."; }
-    }
-
-    // --- INDSTILLINGER ---
     function toggleSettings() {
         const s = document.getElementById('settings-area');
         const input = document.getElementById('api_key_input');
-        if (s.style.display === 'none') {
-            s.style.display = 'block';
-            input.value = localStorage.getItem('gemini_api_key_V2') || "";
-        } else { s.style.display = 'none'; }
+        if (s.style.display === 'none') { s.style.display = 'block'; input.value = localStorage.getItem('gemini_api_key_V2') || ""; }
+        else { s.style.display = 'none'; }
     }
     function saveKey() { localStorage.setItem('gemini_api_key_V2', document.getElementById('api_key_input').value.trim()); showToast("Nøgle Gemt!"); toggleSettings(); }
     function deleteKey() { if(confirm("Slet nøgle?")) { localStorage.removeItem('gemini_api_key_V2'); document.getElementById('api_key_input').value = ""; showToast("Slettet!"); } }
-
-    // --- STANDARD SYSTEM ---
     function getWeekNumber(d) { d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7)); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil(((d - yearStart) / 86400000 + 1)/7); }
     function changeWeek(offset) { currentWeekOffset += offset; setupCalendar(); }
-    
-    let timerInterval;
-    function startTimer() {
-        clearInterval(timerInterval);
-        let btn = document.getElementById('timer-btn');
-        let fill = document.getElementById('timer-fill');
-        let timeLeft = 90;
-        timerInterval = setInterval(() => {
-            timeLeft--; btn.innerText = `PAUSE: ${timeLeft} SEK`; fill.style.width = ((90 - timeLeft) / 90 * 100) + "%";
-            if(timeLeft <= 0) { clearInterval(timerInterval); btn.innerText = "KLAR!"; fill.style.width = "100%"; }
-        }, 1000);
-    }
-
+    function startTimer() { let timeLeft = 90; const btn = document.getElementById('timer-btn'); const fill = document.getElementById('timer-fill'); const timerInterval = setInterval(() => { timeLeft--; btn.innerText = `PAUSE: ${timeLeft} SEK`; fill.style.width = ((90 - timeLeft) / 90 * 100) + "%"; if(timeLeft <= 0) { clearInterval(timerInterval); btn.innerText = "KLAR!"; fill.style.width = "100%"; } }, 1000); }
     function toggleInfo(id) { document.getElementById(`${id}_info_box`).classList.toggle('show'); }
-
-    function setStatus(exId, color) {
-        ['g','y','r'].forEach(c => { const el = document.getElementById(`${exId}_status_${c}`); if(el) el.className = 'status-btn'; });
-        document.getElementById(`${exId}_status_${color.charAt(0)}`).classList.add('active-' + color.charAt(0));
-        document.getElementById(`${exId}_status_val`).value = color;
-    }
+    function setStatus(exId, color) { ['g','y','r'].forEach(c => { const el = document.getElementById(`${exId}_status_${c}`); if(el) el.className = 'status-btn'; }); document.getElementById(`${exId}_status_${color.charAt(0)}`).classList.add('active-' + color.charAt(0)); document.getElementById(`${exId}_status_val`).value = color; }
 
     function renderApp() {
         const container = document.getElementById('workout-container');
         exercises.forEach((ex, index) => {
             const card = document.createElement('div');
             card.className = `exercise-card card-${index % 6}`;
-            let content = `
-                <div class="card-header">
-                    <div class="exercise-name">${index+1}. ${ex.name}</div>
-                    <button class="info-btn" onclick="toggleInfo('${ex.id}')">ℹ️ Info</button>
-                </div>
-                <div class="info-box" id="${ex.id}_info_box">${ex.info}</div>
-                <div class="status-group">
-                    <button class="status-btn" id="${ex.id}_status_g" onclick="setStatus('${ex.id}', 'green')">🟢 OK</button>
-                    <button class="status-btn" id="${ex.id}_status_y" onclick="setStatus('${ex.id}', 'yellow')">🟡 ØM</button>
-                    <button class="status-btn" id="${ex.id}_status_r" onclick="setStatus('${ex.id}', 'red')">🔴 AV</button>
-                    <input type="hidden" id="${ex.id}_status_val">
-                </div>
-            `;
-            if (ex.type === 'strength') {
-                for (let i = 1; i <= 3; i++) {
-                    content += `<div class="set-row">
-                        <div class="set-inputs"><span>Sæt ${i}</span><div><input type="number" id="${ex.id}_s${i}_kg" placeholder="KG"> x <input type="number" id="${ex.id}_s${i}_reps" placeholder="REPS"></div></div>
-                        <div style="font-size:0.7em; color:var(--neon-yellow); margin-top:2px;">>> 10-12 reps | 90s Pause</div>
-                    </div>`;
-                }
-            } else { content += `<div class="set-row"><div class="set-inputs"><span>Tid</span><input type="number" id="${ex.id}_time" placeholder="MIN"></div></div>`; }
+            let content = `<div class="card-header"><div class="exercise-name">${index+1}. ${ex.name}</div><button class="info-btn" onclick="toggleInfo('${ex.id}')">ℹ️ Info</button></div><div class="info-box" id="${ex.id}_info_box">${ex.info}</div><div class="status-group"><button class="status-btn" id="${ex.id}_status_g" onclick="setStatus('${ex.id}', 'green')">🟢 OK</button><button class="status-btn" id="${ex.id}_status_y" onclick="setStatus('${ex.id}', 'yellow')">🟡 ØM</button><button class="status-btn" id="${ex.id}_status_r" onclick="setStatus('${ex.id}', 'red')">🔴 AV</button><input type="hidden" id="${ex.id}_status_val"></div>`;
+            if (ex.type === 'strength') { for (let i = 1; i <= 3; i++) { content += `<div class="set-row"><div class="set-inputs"><span>Sæt ${i}</span><div><input type="number" id="${ex.id}_s${i}_kg" placeholder="KG"> x <input type="number" id="${ex.id}_s${i}_reps" placeholder="REPS"></div></div></div>`; } }
+            else { content += `<div class="set-row"><div class="set-inputs"><span>Tid</span><input type="number" id="${ex.id}_time" placeholder="MIN"></div></div>`; }
             content += `<textarea id="${ex.id}_note" placeholder="Noter..."></textarea><div style="text-align:right; margin-top:10px;">Færdig? <input type="checkbox" id="${ex.id}_check" onchange="updateProgress()"></div>`;
             card.innerHTML = content;
             container.appendChild(card);
@@ -324,41 +272,13 @@
         loadData();
     }
 
-    function updateProgress() {
-        let done = 0; exercises.forEach(ex => { if(document.getElementById(`${ex.id}_check`).checked) done++; });
-        document.getElementById('progress-bar').style.width = (done / exercises.length * 100) + "%";
-    }
-
-    function saveData() {
-        let activeDays = [];
-        document.querySelectorAll('.day-box.active').forEach(db => activeDays.push(db.id));
-        localStorage.setItem('calendar_V3', JSON.stringify(activeDays));
-        let data = { date: new Date().toLocaleDateString('da-DK'), exercises: {} };
-        exercises.forEach(ex => {
-            data.exercises[ex.id] = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value };
-        });
-        localStorage.setItem('workoutData_V3', JSON.stringify(data));
-        showToast("DATA GEMT");
-    }
-
-    function loadData() {
-        const saved = localStorage.getItem('workoutData_V3');
-        if (!saved) return;
-        const data = JSON.parse(saved);
-        exercises.forEach(ex => {
-            const ed = data.exercises[ex.id];
-            if(ed) {
-                document.getElementById(`${ex.id}_check`).checked = ed.checked;
-                if(ed.status) setStatus(ex.id, ed.status);
-            }
-        });
-        updateProgress();
-    }
-
+    function updateProgress() { let done = 0; exercises.forEach(ex => { if(document.getElementById(`${ex.id}_check`).checked) done++; }); document.getElementById('progress-bar').style.width = (done / exercises.length * 100) + "%"; }
+    function saveData() { let activeDays = []; document.querySelectorAll('.day-box.active').forEach(db => activeDays.push(db.id)); localStorage.setItem('calendar_V3', JSON.stringify(activeDays)); let data = { date: new Date().toLocaleDateString('da-DK'), exercises: {} }; exercises.forEach(ex => { data.exercises[ex.id] = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value }; }); localStorage.setItem('workoutData_V3', JSON.stringify(data)); showToast("DATA GEMT"); }
+    function loadData() { const saved = localStorage.getItem('workoutData_V3'); if (!saved) return; const data = JSON.parse(saved); exercises.forEach(ex => { const ed = data.exercises[ex.id]; if(ed) { document.getElementById(`${ex.id}_check`).checked = ed.checked; if(ed.status) setStatus(ex.id, ed.status); } }); updateProgress(); }
     function exportData() { saveData(); showToast("KOPIERET"); }
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 2000); }
 
-    window.onload = () => { renderApp(); };
+    window.onload = renderApp;
 </script>
 </body>
 </html>
