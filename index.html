@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 4.8 - Core Edition</title>
+    <title>Fitness Master 4.9 - Plank Timer</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -80,13 +80,17 @@
         .timer-btn-main { background: var(--neon-orange); color: #000; border: none; padding: 11px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-family: inherit; border-radius: 4px; font-size: 0.8em; width: 100%; }
         .timer-sec-input { width: 50px !important; padding: 4px !important; font-size: 13px !important; background: #000; color: var(--neon-orange) !important; border: 1px solid var(--neon-orange) !important; border-radius: 3px; }
 
+        /* Stopur til Planken */
+        .stopwatch-btn { background: #222; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; font-size: 0.8em; }
+        .stopwatch-display { font-size: 1.1em; color: var(--neon-green); min-width: 45px; text-align: center; }
+
         #toast { visibility: hidden; position: fixed; left: 50%; bottom: 200px; transform: translateX(-50%); background: var(--neon-green); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; border-radius: 50px; font-size: 0.8em; }
         #toast.show { visibility: visible; }
     </style>
 </head>
 <body>
 
-    <h1>Fitness Master 4.8</h1>
+    <h1>Fitness Master 4.9</h1>
     
     <div class="calendar-container">
         <div class="week-grid" id="week-grid"></div>
@@ -126,7 +130,7 @@
                 </div>
             </div>
         </div>
-        <div style="text-align:center; font-size:0.55em; color:#444; margin-top:8px;" onclick="toggleSettings()">V4.8 | Indstillinger ⚙️</div>
+        <div style="text-align:center; font-size:0.55em; color:#444; margin-top:8px;" onclick="toggleSettings()">V4.9 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:10px;">
             <input type="text" id="api_key_input" style="width:100%; font-size:12px; margin-bottom:5px;" placeholder="Indsæt AI nøgle...">
@@ -145,11 +149,14 @@
         { id: 'traekned', name: '5. Træk til bryst', type: 'strength', info: '<b>Teknik:</b> Træk stangen til øvre bryst. Læn dig kun lidt tilbage. <br><br><b>Fokus:</b> Træk med albuerne.' },
         { id: 'benstraek', name: '6. Benstræk (Forlår)', type: 'strength', info: '<b>Teknik:</b> Sid helt tilbage. Isoler forsiden af låret kontrolleret. Juster rullen så den sidder over anklen.' },
         { id: 'legcurl', name: '7. Siddende Leg Curl (Baglår)', type: 'strength', info: '<b>Teknik:</b> Lås lårene fast med puden. Træk hælene ned og ind under dig. <br><br><b>Fokus:</b> Balancerer din bentræning og styrker muskulaturen omkring bækkenet.' },
-        { id: 'planken', name: '8. Planken (Core/Mave)', type: 'cardio', info: '<b>Teknik:</b> Hvil på underarmene og tæerne (eller knæene). Hold kroppen helt ret. <br><br><b>Fokus:</b> Sug navlen ind. Opbygger et stærkt "korset" omkring ryggen helt uden at belaste halebenet.' }
+        { id: 'planken', name: '8. Planken (Core/Mave)', type: 'plank', info: '<b>Teknik:</b> Hvil på underarmene og tæerne (eller knæene). Hold kroppen helt ret. Sug navlen ind. <br><br><b>Mål:</b> 30 sekunder. Stop straks, hvis du hænger i lænden!' }
     ];
 
     let weightChart;
     let timerInterval;
+    let plankTimerInterval;
+    let plankSeconds = 0;
+    let isPlankRunning = false;
 
     function startTimer() {
         clearInterval(timerInterval);
@@ -166,6 +173,36 @@
                 try { new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); } catch(e){}
             }
         }, 1000);
+    }
+
+    // --- PLANK STOPUR LOGIK ---
+    function togglePlankTimer(exId) {
+        const btn = document.getElementById(`${exId}_sw_btn`);
+        const display = document.getElementById(`${exId}_sw_display`);
+        const inputField = document.getElementById(`${exId}_time`);
+
+        if (isPlankRunning) {
+            // STOP
+            clearInterval(plankTimerInterval);
+            isPlankRunning = false;
+            btn.innerText = "START";
+            btn.style.borderColor = "var(--neon-green)";
+            btn.style.color = "var(--neon-green)";
+            inputField.value = plankSeconds; // Sætter tiden direkte i logfeltet
+            plankSeconds = 0; // Nulstil til næste gang
+        } else {
+            // START
+            plankSeconds = 0;
+            isPlankRunning = true;
+            btn.innerText = "STOP";
+            btn.style.borderColor = "var(--neon-red)";
+            btn.style.color = "var(--neon-red)";
+            
+            plankTimerInterval = setInterval(() => {
+                plankSeconds++;
+                display.innerText = plankSeconds + "s";
+            }, 1000);
+        }
     }
 
     function setupCalendar() {
@@ -263,8 +300,10 @@
                     if(ed.s1_kg || ed.s1_reps) txt += `  - Sæt 1: ${ed.s1_kg || 0} kg x ${ed.s1_reps || 0} reps\n`;
                     if(ed.s2_kg || ed.s2_reps) txt += `  - Sæt 2: ${ed.s2_kg || 0} kg x ${ed.s2_reps || 0} reps\n`;
                     if(ed.s3_kg || ed.s3_reps) txt += `  - Sæt 3: ${ed.s3_kg || 0} kg x ${ed.s3_reps || 0} reps\n`;
+                } else if(ex.type === 'plank') {
+                    if(ed.time) txt += `  - Holdt tid: ${ed.time} sekunder\n`;
                 } else {
-                    if(ed.time) txt += `  - Tid: ${ed.time} minutter/sekunder\n`;
+                    if(ed.time) txt += `  - Tid: ${ed.time} minutter\n`;
                 }
                 txt += `  - Status: ${ed.status === 'green' ? '🟢 OK' : ed.status === 'yellow' ? '🟡 ØM' : ed.status === 'red' ? '🔴 AV' : 'Ikke sat'}\n`;
                 if(ed.note) txt += `  - Note: ${ed.note}\n`;
@@ -284,8 +323,9 @@
         container.innerHTML = '';
         exercises.forEach((ex, index) => {
             const card = document.createElement('div');
-            card.className = `exercise-card card-${index % 7}`;
+            card.className = `exercise-card card-${index % 8}`;
             let setsHtml = '';
+            
             if (ex.type === 'strength') {
                 for (let i = 1; i <= 3; i++) {
                     setsHtml += `
@@ -301,6 +341,20 @@
                             <div class="ghost-text" id="${ex.id}_s${i}_ghost"></div>
                         </div>`;
                 }
+            } else if (ex.type === 'plank') {
+                // Særligt layout til Planken med indbygget stopur
+                setsHtml = `
+                    <div class="set-row-wrapper">
+                        <div class="set-row-flex" style="gap: 10px;">
+                            <button id="${ex.id}_sw_btn" class="stopwatch-btn" onclick="togglePlankTimer('${ex.id}')">START</button>
+                            <span id="${ex.id}_sw_display" class="stopwatch-display">0s</span>
+                            <div style="margin-left: auto; display: flex; align-items: center; gap: 5px;">
+                                <span class="set-label">Mål/Resultat:</span>
+                                <input type="number" id="${ex.id}_time" style="width:60px" placeholder="SEK">
+                            </div>
+                        </div>
+                        <div class="ghost-text" id="${ex.id}_ghost"></div>
+                    </div>`;
             } else {
                 setsHtml = `
                     <div class="set-row-wrapper">
@@ -381,6 +435,8 @@
                         if(ed.s1_kg || ed.s1_reps) document.getElementById(`${ex.id}_s1_ghost`).innerText = `Sidst: ${ed.s1_kg || 0}kg x ${ed.s1_reps || 0} | Nyt mål: ${target1}kg`;
                         if(ed.s2_kg || ed.s2_reps) document.getElementById(`${ex.id}_s2_ghost`).innerText = `Sidst: ${ed.s2_kg || 0}kg x ${ed.s2_reps || 0} | Nyt mål: ${target2}kg`;
                         if(ed.s3_kg || ed.s3_reps) document.getElementById(`${ex.id}_s3_ghost`).innerText = `Sidst: ${ed.s3_kg || 0}kg x ${ed.s3_reps || 0} | Nyt mål: ${target3}kg`;
+                    } else if (ex.type === 'plank') {
+                        if(ed.time) document.getElementById(`${ex.id}_ghost`).innerText = `Sidst: ${ed.time} sek`;
                     } else {
                         if(ed.time) document.getElementById(`${ex.id}_ghost`).innerText = `Sidst: ${ed.time}`;
                     }
