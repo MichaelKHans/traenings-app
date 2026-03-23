@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 4.3 - Michael Edition</title>
+    <title>Fitness Master 4.4 - Michael Edition</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -63,7 +63,8 @@
         /* AI SEKTION */
         .ai-log-section { background-color: #000; border: 2px solid var(--neon-cyan); padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--neon-cyan); }
         #ai-response-box { display: none; background-color: #111; border: 1px solid var(--neon-green); padding: 12px; margin-top: 15px; color: var(--neon-green); font-size: 0.85em; line-height: 1.5; border-radius: 4px; }
-        .btn-ai-inline { background: var(--neon-cyan); color: #000; border: none; padding: 12px; width: 100%; margin-top: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-family: inherit; border-radius: 4px; }
+        .btn-ai-inline { background: var(--neon-cyan); color: #000; border: none; padding: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-family: inherit; border-radius: 4px; }
+        .btn-copy-log { background: var(--neon-purple); color: #fff; border: 2px solid var(--neon-purple); padding: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-family: inherit; border-radius: 4px; }
 
         /* FASTBUND-BAR */
         .bottom-fixed-container { position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(13, 17, 23, 0.98); padding: 12px; border-top: 2px solid #333; z-index: 1000; box-sizing: border-box; }
@@ -81,7 +82,7 @@
 </head>
 <body>
 
-    <h1>Fitness Master 4.3</h1>
+    <h1>Fitness Master 4.4</h1>
     
     <div class="calendar-container">
         <div class="week-grid" id="week-grid"></div>
@@ -99,14 +100,19 @@
 
     <div class="ai-log-section">
         <div style="color:var(--neon-cyan); font-size:0.8em; text-transform:uppercase; margin-bottom:8px; letter-spacing:1px;">🤖 AI Michael-Coach</div>
-        <textarea id="ai_log_input" rows="3" placeholder="Spørg om ryg, teknik eller dagens form..."></textarea>
-        <button class="btn-ai-inline" onclick="askGemini()">[ Spørg Gemini ]</button>
+        <textarea id="ai_log_input" rows="3" placeholder="Spørg din AI træner (i appen) om ryg, teknik eller dagens form..."></textarea>
+        
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="btn-ai-inline" style="flex: 1;" onclick="askGemini()">[ Spørg i appen ]</button>
+            <button class="btn-copy-log" style="flex: 1;" onclick="exportLogToClipboard()">[ Kopier Log til Gemini ]</button>
+        </div>
+
         <div id="ai-response-box"></div>
     </div>
 
     <div class="bottom-fixed-container">
         <div class="footer-flex">
-            <button class="btn-save-bottom" onclick="saveData()">Gem Log</button>
+            <button class="btn-save-bottom" onclick="saveData()">Gem Dagens Log</button>
             
             <div class="timer-control-box">
                 <button class="timer-btn-main" id="timer-btn" onclick="startTimer()">Start Pause</button>
@@ -116,7 +122,7 @@
                 </div>
             </div>
         </div>
-        <div style="text-align:center; font-size:0.55em; color:#444; margin-top:8px;" onclick="toggleSettings()">V4.3 | Indstillinger ⚙️</div>
+        <div style="text-align:center; font-size:0.55em; color:#444; margin-top:8px;" onclick="toggleSettings()">V4.4 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:10px;">
             <input type="text" id="api_key_input" style="width:100%; font-size:12px; margin-bottom:5px;" placeholder="Indsæt AI nøgle...">
@@ -184,7 +190,7 @@
         const weights = JSON.parse(localStorage.getItem('weight_logs_V4') || "{}");
         const activeDays = JSON.parse(localStorage.getItem('calendar_V4') || "[]");
         if (!activeDays.includes(id)) {
-            const weight = prompt("Indtast vægt (kg):");
+            const weight = prompt("Indtast dagens vægt (kg):");
             if (weight) { weights[id] = weight; activeDays.push(id); }
         } else { if(confirm("Slet log?")) { activeDays.splice(activeDays.indexOf(id), 1); delete weights[id]; } }
         localStorage.setItem('weight_logs_V4', JSON.stringify(weights));
@@ -216,9 +222,9 @@
         if (!userMsg) return;
         const responseBox = document.getElementById('ai-response-box');
         responseBox.style.display = 'block';
-        responseBox.innerText = "Michael, jeg tjekker dine data... 🤖";
+        responseBox.innerText = "Michael, jeg analyserer din historik... 🤖";
         const weights = JSON.parse(localStorage.getItem('weight_logs_V4') || "{}");
-        const lastWeight = Object.values(weights).pop() || "85";
+        const lastWeight = Object.values(weights).pop() || "Ukendt";
         const context = `Du er træner for Michael (bygningskonstruktør, rygskade). Seneste vægt: ${lastWeight}kg. Han spørger: "${userMsg}". Svar kort på dansk.`;
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${key}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] }) });
@@ -226,6 +232,51 @@
             responseBox.innerText = result.candidates[0].content.parts[0].text;
             responseBox.style.color = "var(--neon-green)";
         } catch (e) { responseBox.innerText = "Fejl i AI forbindelsen."; }
+    }
+
+    // --- NY FUNKTION: KOPIER LOG TIL GEMINI CHAT ---
+    function exportLogToClipboard() {
+        saveData(); // Gemmer automatisk alt indtastet først
+        
+        const data = JSON.parse(localStorage.getItem('workoutData_V4') || "{}");
+        const weights = JSON.parse(localStorage.getItem('weight_logs_V4') || "{}");
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayWeight = weights['day_' + todayStr] || 'Ikke angivet';
+        
+        let txt = `🏋️ FITNESS MASTER LOG - MICHAEL\n`;
+        txt += `📅 Dato: ${data.date || new Date().toLocaleDateString()}\n`;
+        txt += `⚖️ Vægt: ${todayWeight} kg\n`;
+        txt += `-------------------\n\n`;
+        
+        let hasData = false;
+
+        exercises.forEach(ex => {
+            const ed = data.exercises ? data.exercises[ex.id] : null;
+            if(ed && ed.checked) {
+                hasData = true;
+                txt += `✅ ${ex.name}:\n`;
+                if(ex.type === 'strength') {
+                    if(ed.s1_kg || ed.s1_reps) txt += `  - Sæt 1: ${ed.s1_kg || 0} kg x ${ed.s1_reps || 0} reps\n`;
+                    if(ed.s2_kg || ed.s2_reps) txt += `  - Sæt 2: ${ed.s2_kg || 0} kg x ${ed.s2_reps || 0} reps\n`;
+                    if(ed.s3_kg || ed.s3_reps) txt += `  - Sæt 3: ${ed.s3_kg || 0} kg x ${ed.s3_reps || 0} reps\n`;
+                } else {
+                    if(ed.time) txt += `  - Tid: ${ed.time} minutter\n`;
+                }
+                txt += `  - Krop-Status: ${ed.status === 'green' ? '🟢 OK' : ed.status === 'yellow' ? '🟡 ØM' : ed.status === 'red' ? '🔴 AV' : 'Ikke sat'}\n`;
+                if(ed.note) txt += `  - Note: ${ed.note}\n`;
+                txt += `\n`;
+            }
+        });
+
+        if(!hasData) {
+            txt += "Ingen øvelser er markeret som 'Færdig' endnu i dag.\n";
+        }
+
+        navigator.clipboard.writeText(txt).then(() => {
+            showToast("LOG KOPIERET!");
+        }).catch(err => {
+            alert("Kunne ikke kopiere automatisk. Prøv igen.");
+        });
     }
 
     function toggleInfo(id) { document.getElementById(`${id}_info`).classList.toggle('show'); }
