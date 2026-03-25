@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 4.9 - Plank Timer</title>
+    <title>Fitness Master 5.0 - Auto-Fill</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -48,12 +48,12 @@
         .info-box { display: none; background-color: #000; border: 1px solid var(--neon-cyan); padding: 12px; margin: 10px 0; font-size: 0.8em; color: var(--text-color); line-height: 1.5; border-radius: 4px; }
         .info-box.show { display: block; }
 
-        /* Sæt Rækker & Spøgelsestekst */
+        /* Sæt Rækker */
         .set-row-wrapper { margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #222; }
         .set-row-flex { display: flex; align-items: center; justify-content: space-between; }
         .set-label { font-size: 0.75em; color: var(--muted-text); min-width: 50px; }
         .input-group { display: flex; align-items: center; gap: 5px; }
-        .ghost-text { font-size: 0.65em; color: var(--neon-yellow); text-align: right; margin-top: 4px; font-style: italic; min-height: 12px; }
+        .suggestion-text { font-size: 0.65em; color: var(--neon-green); text-align: right; margin-top: 4px; font-style: italic; min-height: 12px; }
 
         input[type="number"], input[type="text"] { width: 60px; padding: 8px; background-color: #000; border: 1px solid #444; color: var(--neon-yellow); text-align: center; font-family: inherit; font-size: 15px; border-radius: 4px; }
         textarea { width: 100%; padding: 10px; background-color: #000; border: 1px solid var(--muted-text); color: #fff; margin-top: 8px; font-family: inherit; box-sizing: border-box; border-radius: 4px; font-size: 0.8em; }
@@ -90,7 +90,7 @@
 </head>
 <body>
 
-    <h1>Fitness Master 4.9</h1>
+    <h1>Fitness Master 5.0</h1>
     
     <div class="calendar-container">
         <div class="week-grid" id="week-grid"></div>
@@ -130,7 +130,7 @@
                 </div>
             </div>
         </div>
-        <div style="text-align:center; font-size:0.55em; color:#444; margin-top:8px;" onclick="toggleSettings()">V4.9 | Indstillinger ⚙️</div>
+        <div style="text-align:center; font-size:0.55em; color:#444; margin-top:8px;" onclick="toggleSettings()">V5.0 | Indstillinger ⚙️</div>
         
         <div id="settings-area" style="display:none; padding-top:10px;">
             <input type="text" id="api_key_input" style="width:100%; font-size:12px; margin-bottom:5px;" placeholder="Indsæt AI nøgle...">
@@ -175,29 +175,25 @@
         }, 1000);
     }
 
-    // --- PLANK STOPUR LOGIK ---
     function togglePlankTimer(exId) {
         const btn = document.getElementById(`${exId}_sw_btn`);
         const display = document.getElementById(`${exId}_sw_display`);
         const inputField = document.getElementById(`${exId}_time`);
 
         if (isPlankRunning) {
-            // STOP
             clearInterval(plankTimerInterval);
             isPlankRunning = false;
             btn.innerText = "START";
             btn.style.borderColor = "var(--neon-green)";
             btn.style.color = "var(--neon-green)";
-            inputField.value = plankSeconds; // Sætter tiden direkte i logfeltet
-            plankSeconds = 0; // Nulstil til næste gang
+            inputField.value = plankSeconds;
+            plankSeconds = 0; 
         } else {
-            // START
             plankSeconds = 0;
             isPlankRunning = true;
             btn.innerText = "STOP";
             btn.style.borderColor = "var(--neon-red)";
             btn.style.color = "var(--neon-red)";
-            
             plankTimerInterval = setInterval(() => {
                 plankSeconds++;
                 display.innerText = plankSeconds + "s";
@@ -338,11 +334,10 @@
                                     <input type="number" id="${ex.id}_s${i}_reps" placeholder="REPS">
                                 </div>
                             </div>
-                            <div class="ghost-text" id="${ex.id}_s${i}_ghost"></div>
+                            <div class="suggestion-text" id="${ex.id}_s${i}_ghost"></div>
                         </div>`;
                 }
             } else if (ex.type === 'plank') {
-                // Særligt layout til Planken med indbygget stopur
                 setsHtml = `
                     <div class="set-row-wrapper">
                         <div class="set-row-flex" style="gap: 10px;">
@@ -353,7 +348,6 @@
                                 <input type="number" id="${ex.id}_time" style="width:60px" placeholder="SEK">
                             </div>
                         </div>
-                        <div class="ghost-text" id="${ex.id}_ghost"></div>
                     </div>`;
             } else {
                 setsHtml = `
@@ -362,7 +356,6 @@
                             <span class="set-label">Tid/Mål</span>
                             <input type="text" id="${ex.id}_time" style="width:100px" placeholder="Indtast">
                         </div>
-                        <div class="ghost-text" id="${ex.id}_ghost"></div>
                     </div>`;
             }
             
@@ -418,6 +411,7 @@
             const ed = data.exercises[ex.id]; 
             if(ed) { 
                 if(isToday) {
+                    // Indlæs alt for dagens træning
                     document.getElementById(`${ex.id}_check`).checked = ed.checked; 
                     if(ed.status) setStatus(ex.id, ed.status); 
                     document.getElementById(`${ex.id}_note`).value = ed.note || '';
@@ -427,18 +421,24 @@
                         document.getElementById(`${ex.id}_s3_kg`).value = ed.s3_kg || ''; document.getElementById(`${ex.id}_s3_reps`).value = ed.s3_reps || '';
                     } else { document.getElementById(`${ex.id}_time`).value = ed.time || ''; }
                 } else {
+                    // NY DAG: Auto-udfyld kun tallene fra sidst. Hold status, noter og kryds blanke.
                     if(ex.type === 'strength') {
+                        document.getElementById(`${ex.id}_s1_kg`).value = ed.s1_kg || ''; document.getElementById(`${ex.id}_s1_reps`).value = ed.s1_reps || '';
+                        document.getElementById(`${ex.id}_s2_kg`).value = ed.s2_kg || ''; document.getElementById(`${ex.id}_s2_reps`).value = ed.s2_reps || '';
+                        document.getElementById(`${ex.id}_s3_kg`).value = ed.s3_kg || ''; document.getElementById(`${ex.id}_s3_reps`).value = ed.s3_reps || '';
+                        
+                        // Forslag til progression hvis det gik godt sidst
                         let target1 = ed.s1_kg; if(ed.s1_reps >= 12 && ed.status === 'green') target1 = (parseFloat(ed.s1_kg) || 0) + 5;
+                        if(target1 > ed.s1_kg) document.getElementById(`${ex.id}_s1_ghost`).innerText = `Forslag: Øg til ${target1}kg`;
+                        
                         let target2 = ed.s2_kg; if(ed.s2_reps >= 12 && ed.status === 'green') target2 = (parseFloat(ed.s2_kg) || 0) + 5;
+                        if(target2 > ed.s2_kg) document.getElementById(`${ex.id}_s2_ghost`).innerText = `Forslag: Øg til ${target2}kg`;
+                        
                         let target3 = ed.s3_kg; if(ed.s3_reps >= 12 && ed.status === 'green') target3 = (parseFloat(ed.s3_kg) || 0) + 5;
+                        if(target3 > ed.s3_kg) document.getElementById(`${ex.id}_s3_ghost`).innerText = `Forslag: Øg til ${target3}kg`;
 
-                        if(ed.s1_kg || ed.s1_reps) document.getElementById(`${ex.id}_s1_ghost`).innerText = `Sidst: ${ed.s1_kg || 0}kg x ${ed.s1_reps || 0} | Nyt mål: ${target1}kg`;
-                        if(ed.s2_kg || ed.s2_reps) document.getElementById(`${ex.id}_s2_ghost`).innerText = `Sidst: ${ed.s2_kg || 0}kg x ${ed.s2_reps || 0} | Nyt mål: ${target2}kg`;
-                        if(ed.s3_kg || ed.s3_reps) document.getElementById(`${ex.id}_s3_ghost`).innerText = `Sidst: ${ed.s3_kg || 0}kg x ${ed.s3_reps || 0} | Nyt mål: ${target3}kg`;
-                    } else if (ex.type === 'plank') {
-                        if(ed.time) document.getElementById(`${ex.id}_ghost`).innerText = `Sidst: ${ed.time} sek`;
-                    } else {
-                        if(ed.time) document.getElementById(`${ex.id}_ghost`).innerText = `Sidst: ${ed.time}`;
+                    } else if (ex.type === 'plank' || ex.type === 'cardio') {
+                        document.getElementById(`${ex.id}_time`).value = ed.time || '';
                     }
                 }
             } 
