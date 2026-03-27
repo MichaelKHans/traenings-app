@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fitness Master 5.0 - Auto-Fill</title>
+    <title>Fitness Master 5.1 - History Edition</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -48,7 +48,7 @@
         .info-box { display: none; background-color: #000; border: 1px solid var(--neon-cyan); padding: 12px; margin: 10px 0; font-size: 0.8em; color: var(--text-color); line-height: 1.5; border-radius: 4px; }
         .info-box.show { display: block; }
 
-        /* Sæt Rækker */
+        /* Sæt Rækker & Spøgelsestekst */
         .set-row-wrapper { margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #222; }
         .set-row-flex { display: flex; align-items: center; justify-content: space-between; }
         .set-label { font-size: 0.75em; color: var(--muted-text); min-width: 50px; }
@@ -84,13 +84,17 @@
         .stopwatch-btn { background: #222; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; font-size: 0.8em; }
         .stopwatch-display { font-size: 1.1em; color: var(--neon-green); min-width: 45px; text-align: center; }
 
+        /* HISTORIK MENU */
+        #history-area { display: none; background: #000; border: 1px solid var(--neon-purple); padding: 10px; margin-top: 10px; border-radius: 4px; max-height: 150px; overflow-y: auto; }
+        .history-btn { display: block; width: 100%; background: #111; color: var(--neon-purple); border: 1px solid var(--neon-purple); padding: 8px; margin-bottom: 5px; text-align: left; cursor: pointer; border-radius: 3px; font-family: inherit; }
+
         #toast { visibility: hidden; position: fixed; left: 50%; bottom: 200px; transform: translateX(-50%); background: var(--neon-green); color: #000; padding: 10px 20px; font-weight: bold; z-index: 2000; text-transform: uppercase; border-radius: 50px; font-size: 0.8em; }
         #toast.show { visibility: visible; }
     </style>
 </head>
 <body>
 
-    <h1>Fitness Master 5.0</h1>
+    <h1>Fitness Master 5.1</h1>
     
     <div class="calendar-container">
         <div class="week-grid" id="week-grid"></div>
@@ -112,7 +116,7 @@
         
         <div style="display: flex; gap: 10px; margin-top: 10px;">
             <button class="btn-ai-inline" style="flex: 1;" onclick="askGemini()">[ Spørg i appen ]</button>
-            <button class="btn-copy-log" style="flex: 1;" onclick="exportLogToClipboard()">[ Kopier Log ]</button>
+            <button class="btn-copy-log" style="flex: 1;" onclick="exportLogToClipboard(new Date().toLocaleDateString('da-DK'))">[ Kopier Dagens Log ]</button>
         </div>
 
         <div id="ai-response-box"></div>
@@ -130,8 +134,17 @@
                 </div>
             </div>
         </div>
-        <div style="text-align:center; font-size:0.55em; color:#444; margin-top:8px;" onclick="toggleSettings()">V5.0 | Indstillinger ⚙️</div>
         
+        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 10px;">
+            <div style="font-size:0.55em; color:#666; cursor: pointer;" onclick="toggleHistory()">Historik 📅</div>
+            <div style="font-size:0.55em; color:#666; cursor: pointer;" onclick="toggleSettings()">Indstillinger ⚙️</div>
+        </div>
+        
+        <div id="history-area">
+            <div style="font-size:0.7em; color:var(--neon-purple); margin-bottom:5px;">Vælg dato for at kopiere log:</div>
+            <div id="history-list"></div>
+        </div>
+
         <div id="settings-area" style="display:none; padding-top:10px;">
             <input type="text" id="api_key_input" style="width:100%; font-size:12px; margin-bottom:5px;" placeholder="Indsæt AI nøgle...">
             <button class="btn-save-bottom" style="padding:5px; width:100%;" onclick="saveKey()">Gem Nøgle</button>
@@ -273,16 +286,29 @@
         } catch (e) { responseBox.innerText = "Fejl i forbindelsen."; }
     }
 
-    function exportLogToClipboard() {
-        saveData(); 
-        const data = JSON.parse(localStorage.getItem('workoutData_V4') || "{}");
+    // --- NY FUNKTION TIL HISTORIK OG EXPORT ---
+    function exportLogToClipboard(targetDateStr) {
+        // Hvis man vil kopiere dags dato, gemmer vi først det nyeste
+        const isToday = targetDateStr === new Date().toLocaleDateString('da-DK');
+        if (isToday) saveData();
+
+        const allLogs = JSON.parse(localStorage.getItem('workoutHistory_V5') || "{}");
+        const data = allLogs[targetDateStr];
+
+        if (!data) {
+            alert(`Der er ingen data gemt for ${targetDateStr}`);
+            return;
+        }
+
         const weights = JSON.parse(localStorage.getItem('weight_logs_V4') || "{}");
-        const todayStr = new Date().toISOString().split('T')[0];
-        const todayWeight = weights['day_' + todayStr] || 'Ikke angivet';
+        // Forsøger at finde vægten for den specifikke dato. Omformer formatet til at matche 'day_YYYY-MM-DD'
+        let weightDateFormatted = targetDateStr.split('.').reverse().join('-');
+        if(weightDateFormatted.split('-')[1].length === 1) weightDateFormatted = weightDateFormatted.replace('-', '-0'); // Fix for manglende 0 i måned
+        const weightValue = weights['day_' + weightDateFormatted] || 'Ikke angivet';
         
         let txt = `🏋️ FITNESS MASTER LOG - MICHAEL\n`;
-        txt += `📅 Dato: ${data.date || new Date().toLocaleDateString()}\n`;
-        txt += `⚖️ Vægt: ${todayWeight} kg\n`;
+        txt += `📅 Dato: ${targetDateStr}\n`;
+        txt += `⚖️ Vægt: ${weightValue} kg\n`;
         txt += `-------------------\n\n`;
         
         let hasData = false;
@@ -307,8 +333,41 @@
             }
         });
 
-        if(!hasData) { txt += "Ingen øvelser er markeret som 'Færdig' endnu i dag.\n"; }
+        if(!hasData) { txt += "Ingen øvelser er markeret som 'Færdig' på denne dato.\n"; }
         navigator.clipboard.writeText(txt).then(() => { showToast("LOG KOPIERET!"); }).catch(err => { alert("Kunne ikke kopiere automatisk."); });
+    }
+
+    function toggleHistory() {
+        const h = document.getElementById('history-area');
+        const list = document.getElementById('history-list');
+        
+        if (h.style.display === 'none' || h.style.display === '') {
+            h.style.display = 'block';
+            document.getElementById('settings-area').style.display = 'none'; // Lukker indstillinger hvis åben
+            
+            const allLogs = JSON.parse(localStorage.getItem('workoutHistory_V5') || "{}");
+            const dates = Object.keys(allLogs).sort((a,b) => {
+                // Sorterer datoer nyeste først (simpel string split)
+                let dateA = new Date(a.split('.').reverse().join('-'));
+                let dateB = new Date(b.split('.').reverse().join('-'));
+                return dateB - dateA;
+            });
+
+            list.innerHTML = '';
+            if (dates.length === 0) {
+                list.innerHTML = '<div style="color:#888; font-size:0.8em;">Ingen historik gemt endnu.</div>';
+            } else {
+                dates.forEach(date => {
+                    const btn = document.createElement('button');
+                    btn.className = 'history-btn';
+                    btn.innerText = `📄 Log: ${date}`;
+                    btn.onclick = () => { exportLogToClipboard(date); h.style.display = 'none'; };
+                    list.appendChild(btn);
+                });
+            }
+        } else {
+            h.style.display = 'none';
+        }
     }
 
     function toggleInfo(id) { document.getElementById(`${id}_info`).classList.toggle('show'); }
@@ -388,7 +447,9 @@
     function updateProgress() { let done = 0; exercises.forEach(ex => { if(document.getElementById(`${ex.id}_check`).checked) done++; }); document.getElementById('progress-bar').style.width = (done / exercises.length * 100) + "%"; }
     
     function saveData() { 
-        let data = { date: new Date().toLocaleDateString(), exercises: {} }; 
+        let todayDate = new Date().toLocaleDateString('da-DK');
+        let currentData = { date: todayDate, exercises: {} }; 
+        
         exercises.forEach(ex => { 
             let exData = { checked: document.getElementById(`${ex.id}_check`).checked, status: document.getElementById(`${ex.id}_status_val`).value, note: document.getElementById(`${ex.id}_note`).value }; 
             if(ex.type === 'strength') {
@@ -396,22 +457,32 @@
                 exData.s2_kg = document.getElementById(`${ex.id}_s2_kg`).value; exData.s2_reps = document.getElementById(`${ex.id}_s2_reps`).value;
                 exData.s3_kg = document.getElementById(`${ex.id}_s3_kg`).value; exData.s3_reps = document.getElementById(`${ex.id}_s3_reps`).value;
             } else { exData.time = document.getElementById(`${ex.id}_time`).value; }
-            data.exercises[ex.id] = exData; 
+            currentData.exercises[ex.id] = exData; 
         }); 
-        localStorage.setItem('workoutData_V4', JSON.stringify(data)); showToast("LOG GEMT!"); 
+
+        // Gemmer i historikken
+        let allLogs = JSON.parse(localStorage.getItem('workoutHistory_V5') || "{}");
+        allLogs[todayDate] = currentData;
+        localStorage.setItem('workoutHistory_V5', JSON.stringify(allLogs));
+
+        // Gemmer også som den seneste log for at auto-udfyld og spøgelsestekst fungerer
+        localStorage.setItem('workoutData_V5_Latest', JSON.stringify(currentData)); 
+
+        showToast("LOG GEMT I HISTORIK!"); 
     }
 
     function loadData() { 
-        const saved = localStorage.getItem('workoutData_V4'); 
+        // Vi kigger på den seneste gemte data
+        const saved = localStorage.getItem('workoutData_V5_Latest'); 
         if (!saved) return; 
         const data = JSON.parse(saved); 
-        const isToday = data.date === new Date().toLocaleDateString();
+        const isToday = data.date === new Date().toLocaleDateString('da-DK');
         
         exercises.forEach(ex => { 
             const ed = data.exercises[ex.id]; 
             if(ed) { 
                 if(isToday) {
-                    // Indlæs alt for dagens træning
+                    // Indlæs alt for dagens træning, da brugeren er i gang
                     document.getElementById(`${ex.id}_check`).checked = ed.checked; 
                     if(ed.status) setStatus(ex.id, ed.status); 
                     document.getElementById(`${ex.id}_note`).value = ed.note || '';
@@ -421,13 +492,13 @@
                         document.getElementById(`${ex.id}_s3_kg`).value = ed.s3_kg || ''; document.getElementById(`${ex.id}_s3_reps`).value = ed.s3_reps || '';
                     } else { document.getElementById(`${ex.id}_time`).value = ed.time || ''; }
                 } else {
-                    // NY DAG: Auto-udfyld kun tallene fra sidst. Hold status, noter og kryds blanke.
+                    // NY DAG: Auto-udfyld KUN tallene fra sidst.
                     if(ex.type === 'strength') {
                         document.getElementById(`${ex.id}_s1_kg`).value = ed.s1_kg || ''; document.getElementById(`${ex.id}_s1_reps`).value = ed.s1_reps || '';
                         document.getElementById(`${ex.id}_s2_kg`).value = ed.s2_kg || ''; document.getElementById(`${ex.id}_s2_reps`).value = ed.s2_reps || '';
                         document.getElementById(`${ex.id}_s3_kg`).value = ed.s3_kg || ''; document.getElementById(`${ex.id}_s3_reps`).value = ed.s3_reps || '';
                         
-                        // Forslag til progression hvis det gik godt sidst
+                        // Forslag til progression
                         let target1 = ed.s1_kg; if(ed.s1_reps >= 12 && ed.status === 'green') target1 = (parseFloat(ed.s1_kg) || 0) + 5;
                         if(target1 > ed.s1_kg) document.getElementById(`${ex.id}_s1_ghost`).innerText = `Forslag: Øg til ${target1}kg`;
                         
@@ -446,7 +517,7 @@
         if(isToday) updateProgress(); 
     }
 
-    function toggleSettings() { const s = document.getElementById('settings-area'); s.style.display = s.style.display === 'none' ? 'block' : 'none'; }
+    function toggleSettings() { const s = document.getElementById('settings-area'); s.style.display = s.style.display === 'none' ? 'block' : 'none'; document.getElementById('history-area').style.display = 'none'; }
     function saveKey() { localStorage.setItem('gemini_api_key_V2', document.getElementById('api_key_input').value.trim()); showToast("Nøgle Gemt!"); toggleSettings(); }
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 2000); }
 
